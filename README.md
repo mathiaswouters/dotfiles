@@ -4,5 +4,6 @@
 
 ## Example dotfiles repos
 
+- [typecraft-dev](https://github.com/typecraft-dev/dotfiles)
 - [Matt-FTW](https://github.com/Matt-FTW/dotfiles)
 - [mylinuxforwork](https://github.com/mylinuxforwork/dotfiles)
