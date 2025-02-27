@@ -1,5 +1,5 @@
 # Waybar Config
 
-Config Location: `~/.config/waybar/config.jsonc`
+Config Location: `~/.config/waybar/config`
 
 Styling Location: `~/.config/waybar/style.css`
