@@ -34,11 +34,11 @@ DOTFILES_REPO_URL="https://github.com/mathiaswouters/dotfiles.git"
 # Set directory
 DOTFILES_DIR="$HOME/dotfiles"
 
-# Install stow if not already installed
-print_step "Checking for GNU Stow..."
-if ! command_exists stow; then
-    print_step "Installing GNU Stow..."
-    sudo nix-env -iA nixos.gnustow
+# Install git if not already installed
+print_step "Checking for Git..."
+if ! command_exists git; then
+    print_step "Installing Git..."
+    sudo nix-env -iA nixos.git
 fi
 
 # Step 1: Clone or pull the dotfiles repository
@@ -53,23 +53,24 @@ else
     print_step "Cloned dotfiles repository from $DOTFILES_REPO_URL"
 fi
 
-# Step 2: Create necessary directories
-print_step "Creating necessary config directories..."
-mkdir -p "$HOME/.config/hypr"
-mkdir -p "$HOME/.config/waybar"
-mkdir -p "$HOME/.config/mako"
-mkdir -p "$HOME/.config/rofi"
-mkdir -p "$HOME/Pictures/Wallpapers"
+# Step 2: Create necessary parent directory
+print_step "Creating necessary parent directory..."
+mkdir -p "$HOME/.config"
 
-# Step 3: Use stow to create symlinks for each configuration
-print_step "Applying dotfiles with stow..."
+# Step 3: Link config directories to the appropriate locations
+print_step "Setting up your dotfiles..."
 
-# Stow each directory individually
+# Create symbolic links for each configuration directory
 for config_dir in hypr mako rofi waybar; do
-    if [ -d "$DOTFILES_DIR/$config_dir" ]; then
-        print_step "Stowing $config_dir configuration..."
-        stow -d "$DOTFILES_DIR" -t "$HOME" -R "$config_dir"
-        echo "✓ $config_dir configurations linked"
+    if [ -d "$DOTFILES_DIR/.config/$config_dir" ]; then
+        print_step "Linking $config_dir configuration..."
+        # Remove existing directory if it's there
+        if [ -d "$HOME/.config/$config_dir" ]; then
+            rm -rf "$HOME/.config/$config_dir"
+        fi
+        # Create the symbolic link
+        ln -sf "$DOTFILES_DIR/.config/$config_dir" "$HOME/.config/$config_dir"
+        echo "✓ $config_dir configuration linked"
     else
         print_error "Directory $config_dir not found in dotfiles repository"
     fi
@@ -77,14 +78,23 @@ done
 
 # Make scripts executable
 print_step "Making scripts executable..."
-if [ -f "$HOME/.config/hypr/scripts/start.sh" ]; then
-    chmod +x "$HOME/.config/hypr/scripts/start.sh"
-    echo "✓ Made start.sh executable"
-fi
-
 if [ -f "$HOME/.config/hypr/scripts/set-wallpaper.sh" ]; then
     chmod +x "$HOME/.config/hypr/scripts/set-wallpaper.sh"
     echo "✓ Made set-wallpaper.sh executable"
+fi
+
+# Create Wallpapers directory if it doesn't exist
+mkdir -p "$HOME/Pictures/Wallpapers"
+
+# Initialize swww and set wallpaper if available
+if command_exists swww; then
+    print_step "Initializing swww..."
+    swww init
+    
+    if [ -x "$HOME/.config/hypr/scripts/set-wallpaper.sh" ]; then
+        print_step "Setting wallpaper..."
+        "$HOME/.config/hypr/scripts/set-wallpaper.sh"
+    fi
 fi
 
 print_step "Dotfiles setup complete!"
