@@ -9,7 +9,7 @@ zstyle :compinstall filename '/home/mathias/.zshrc'
 ##################
 
 export PATH="$HOME/.local/bin:$PATH"
-eval "$(oh-my-posh init zsh --config $HOME/.config/ohmyposh/zen.toml)"
+eval "$(oh-my-posh init zsh --config $HOME/.config/ohmyposh/catppuccin_mocha.omp.json)"
 
 #############
 ### Zinit ###
