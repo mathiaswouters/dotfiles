@@ -1,115 +1,58 @@
-###################
-### compinstall ###
-###################
-
-zstyle :compinstall filename '/home/mathias/.zshrc'
-
-##################
-### Oh My Posh ###
-##################
-
-export PATH="$HOME/.local/bin:$PATH"
-eval "$(oh-my-posh init zsh --config $HOME/.config/ohmyposh/catppuccin_mocha.omp.json)"
-
-#############
-### Zinit ###
-#############
-
-ZINIT_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/zinit/zinit.git"
-
-# Download Zinit, if it's not there yet
-if [ ! -d "$ZINIT_HOME" ]; then
-   mkdir -p "$(dirname $ZINIT_HOME)"
-   git clone https://github.com/zdharma-continuum/zinit.git "$ZINIT_HOME"
-fi
-
-# Load zinit
-source "${ZINIT_HOME}/zinit.zsh"
-
-# Plugins
-zinit light zsh-users/zsh-syntax-highlighting
-zinit light zsh-users/zsh-completions
-zinit light zsh-users/zsh-autosuggestions
-zinit light Aloxaf/fzf-tab
-#zinit light MichaelAquilina/zsh-you-should-use
-
-# Snippets
-zinit snippet OMZL::git.zsh
-zinit snippet OMZP::git
-zinit snippet OMZP::sudo
-zinit snippet OMZP::dnf
-zinit snippet OMZP::kubectl
-zinit snippet OMZP::kubectx
-zinit snippet OMZP::command-not-found
-
-# Load completions
-autoload -Uz compinit && compinit
-
-zinit cdreplay -q
-
-autoload -Uz _zinit
-(( ${+_comps} )) && _comps[zinit]=_zinit
-
-##########################
-### Completion Styling ###
-##########################
-
+setopt prompt_subst
 zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
-zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
-zstyle ':completion:*' menu no
-zstyle ':fzf-tab:complete:cd:*' fzf-preview 'ls --color $realpath'
+autoload bashcompinit && bashcompinit
+autoload -Uz compinit
+compinit
+source <(kubectl completion zsh)
 
-###############
-### Aliases ###
-###############
 
+source $(brew --prefix)/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+# bindkey '^w' autosuggest-execute
+# bindkey '^e' autosuggest-accept
+# bindkey '^u' autosuggest-toggle
+# bindkey '^L' vi-forward-word
+# bindkey '^k' up-line-or-search
+# bindkey '^j' down-line-or-search
+
+eval "$(starship init zsh)"
+export STARSHIP_CONFIG=~/.config/starship/starship.toml
+
+# You may need to manually set your language environment
+export LANG=en_US.UTF-8
+
+export EDITOR=/opt/homebrew/bin/nvim
+
+alias cat=bat
 alias ls='ls --color'
-alias vim='nvim'
-alias vi='nvim'
+alias ll='ls -al'
 
-##########################
-### Shell Integrations ###
-##########################
+# Git
+alias gc="git commit -m"
+alias gca="git commit -a -m"
+alias gp="git push origin HEAD"
+alias gpu="git pull origin"
+alias gst="git status"
+alias gdiff="git diff"
+alias gco="git checkout"
+alias gb='git branch'
+alias gba='git branch -a'
+alias ga='git add'
+alias gcoall='git checkout -- .'
+alias gr='git remote'
+alias gre='git reset'
 
-eval "$(fzf --zsh)"
+# GO
+export GOPATH='/Users/mathias/go'
 
-###############
-### History ###
-###############
+export PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Users/mathias/.vimpkg/bin:${GOPATH}/bin:/Users/mathias/.cargo/bin
 
-HISTFILE=~/.zsh_history
-HISTSIZE=5000
-SAVEHIST=$HISTSIZE
-HISTDUP=erase
-setopt appendhistory
-setopt sharehistory
-setopt hist_ignore_space
-setopt hist_ignore_all_dups
-setopt hist_save_no_dups
-setopt hist_ignore_dups
-setopt hist_find_no_dups
-unsetopt beep
+### FZF ###
+export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow'
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
-###################
-### Keybindings ###
-###################
+export PATH=/opt/homebrew/bin:$PATH
 
-bindkey -v
+export XDG_CONFIG_HOME="/Users/mathias/.config"
 
-###############
-### Exports ###
-###############
-
-export EDITOR=vim
-export VISUAL=vim
-export PATH=$PATH:/usr/local/go/bin
-
-# Load a few important annexes, without Turbo
-# (this is currently required for annexes)
-zinit light-mode for \
-    zdharma-continuum/zinit-annex-as-monitor \
-    zdharma-continuum/zinit-annex-bin-gem-node \
-    zdharma-continuum/zinit-annex-patch-dl \
-    zdharma-continuum/zinit-annex-rust
-
-### End of Zinit's installer chunk
+eval "$(zoxide init zsh)"
+eval "$(direnv hook zsh)"

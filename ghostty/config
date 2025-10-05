@@ -1,0 +1,12 @@
+theme = catppuccin-mocha
+font-family = "JetBrains Mono"
+font-size = 12
+background-opacity = 0.95
+gtk-titlebar = false
+maximize = true
+background-blur-radius = 20
+mouse-hide-while-typing = true
+window-decoration = true
+# keybind = global:cmd+/=toggle_quick_terminal
+macos-option-as-alt = true
+# background-opacity = 0.7

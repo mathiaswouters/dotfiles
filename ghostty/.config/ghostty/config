@@ -1,6 +1,0 @@
-theme = catppuccin-mocha
-font-family = "JetBrains Mono"
-font-size = 12
-background-opacity = 0.95
-gtk-titlebar = false
-maximize = true
