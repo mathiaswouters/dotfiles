@@ -1,0 +1,116 @@
+
+
+#############################################
+# ZSH CONFIGURATION FOR WSL
+#############################################
+
+# Allow prompt substitution
+setopt prompt_subst
+
+# Case-insensitive completion
+zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
+
+autoload -Uz compinit
+compinit
+
+#############################################
+# AUTOSUGGESTIONS
+#############################################
+
+# From apt (Ubuntu WSL)
+if [ -f /usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh ]; then
+  source /usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+fi
+
+# Optional keybind examples:
+# bindkey '^w' autosuggest-execute
+# bindkey '^e' autosuggest-accept
+# bindkey '^u' autosuggest-toggle
+# bindkey '^L' vi-forward-word
+# bindkey '^k' up-line-or-search
+# bindkey '^j' down-line-or-search
+
+#############################################
+# STARSHIP PROMPT
+#############################################
+
+if command -v starship >/dev/null 2>&1; then
+  eval "$(starship init zsh)"
+  export STARSHIP_CONFIG="$HOME/.config/starship/starship.toml"
+else
+  PROMPT="%n@%m:%~ %# "
+fi
+
+#############################################
+# LOCALE & EDITOR
+#############################################
+
+export LANG=en_US.UTF-8
+export EDITOR=/usr/bin/vim
+
+#############################################
+# ALIASES
+#############################################
+
+# cat → batcat (Ubuntu version of bat)
+alias cat='batcat'
+
+# ls shortcuts
+alias ls='ls --color'
+alias ll='ls -al'
+
+#############################################
+# GIT ALIASES
+#############################################
+
+alias gc="git commit -m"
+alias gca="git commit -a -m"
+alias gp="git push origin HEAD"
+alias gpu="git pull origin"
+alias gst="git status"
+alias gdiff="git diff"
+alias gco="git checkout"
+alias gb='git branch'
+alias gba='git branch -a'
+alias ga='git add'
+alias gcoall='git checkout -- .'
+alias gr='git remote'
+alias gre='git reset'
+
+#############################################
+# PATH SETUP
+#############################################
+
+# Local binaries
+export PATH="$HOME/.local/bin:$HOME/bin:$PATH"
+
+#############################################
+# FZF + FD/FDFIND INTEGRATION
+#############################################
+
+# Use the best available file-search tool for fzf
+if command -v fd >/dev/null 2>&1; then
+  export FZF_DEFAULT_COMMAND="fd --type f --hidden --follow"
+elif command -v fdfind >/dev/null 2>&1; then
+  export FZF_DEFAULT_COMMAND="fdfind --type f --hidden --follow"
+fi
+
+# Load fzf shell integration (if installed)
+[ -f "$HOME/.fzf.zsh" ] && source "$HOME/.fzf.zsh"
+
+#############################################
+# ZOXIDE & DIRENV
+#############################################
+
+command -v zoxide >/dev/null 2>&1 && eval "$(zoxide init zsh)"
+command -v direnv >/dev/null 2>&1 && eval "$(direnv hook zsh)"
+
+#############################################
+# HISTORY SETTINGS
+#############################################
+
+export HISTFILE="$HOME/.zsh_history"
+export HISTSIZE=5000
+export SAVEHIST=5000
+setopt hist_ignore_all_dups share_history inc_append_history
+
