@@ -28,7 +28,7 @@ Your `.zshrc` configuration relies on several modern command-line utilities. Bef
 
 2. Run the dependencies script to install all required packages for your specific OS:
 ```bash
-   ./scripts/setup.sh
+   ./scripts/dependencies.sh
 ```
 
 3. Run the deployment script to safely symlink all configuration files to their appropriate targets:
