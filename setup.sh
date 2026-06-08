@@ -1,29 +1,49 @@
-#!/usr/bin/env bash
+#!/bin/bash
+
+# Exit immediately if a command exits with a non-zero status
 set -e
 
-DEFAULT_TARGET="$HOME/.config"
-HOME_PACKAGES=("zsh")
-SPECIAL_PACKAGES=("atuin")
+DOTFILES_DIR="$HOME/dotfiles"
 
-for pkg in */ ; do
-  pkg="${pkg%/}"
-  
-  if [[ " ${HOME_PACKAGES[@]} " =~ " ${pkg} " ]]; then
-    echo "→ Stowing $pkg into $HOME"
-    stow --target="$HOME" "$pkg"
+# Verify that the dotfiles directory actually exists
+if [ ! -d "$DOTFILES_DIR" ]; then
+    echo "Error: Dotfiles directory not found at $DOTFILES_DIR" >&2
+    echo "Please ensure the repository is cloned to ~/dotfiles before running this script." >&2
+    exit 1
+fi
 
-  elif [[ " ${SPECIAL_PACKAGES[@]} " =~ " ${pkg} " ]]; then
-    TARGET="$DEFAULT_TARGET/$pkg"
-    rm -rf "$TARGET"
-    mkdir -p "$TARGET"
-    echo "→ Stowing $pkg into $TARGET"
-    stow --target="$TARGET" "$pkg"
+echo "Starting dotfiles deployment..."
 
-  else
-    # Force stow to create a subdirectory inside .config
-    TARGET="$DEFAULT_TARGET/$pkg"
-    mkdir -p "$TARGET"   # make sure the target exists
-    echo "→ Stowing $pkg into $TARGET"
-    stow --target="$TARGET" "$pkg"
-  fi
-done
+# Ensure config directories exist
+mkdir -p "$HOME/.config"
+mkdir -p "$HOME/.config/alacritty"
+mkdir -p "$HOME/.config/ghostty"
+mkdir -p "$HOME/.config/lf"
+
+# Helper function to safely symlink files or directories without nesting bugs
+symlink_item() {
+    local src="$1"
+    local dest="$2"
+
+    # If the destination already exists (as a file, symlink, or dir), remove it safely
+    if [ -e "$dest" ] || [ -L "$dest" ]; then
+        rm -rf "$dest"
+    fi
+
+    ln -s "$src" "$dest"
+    echo "Linked: $dest"
+}
+
+# --- Deploy Individual Files ---
+symlink_item "$DOTFILES_DIR/zsh/.zshrc"         "$HOME/.zshrc"
+symlink_item "$DOTFILES_DIR/starship/starship.toml" "$HOME/.config/starship.toml"
+symlink_item "$DOTFILES_DIR/alacritty/alacritty.toml" "$HOME/.config/alacritty/alacritty.toml"
+symlink_item "$DOTFILES_DIR/ghostty/config"     "$HOME/.config/ghostty/config"
+symlink_item "$DOTFILES_DIR/lf/lfrc"           "$HOME/.config/lf/lfrc"
+
+# --- Deploy Whole Directories ---
+symlink_item "$DOTFILES_DIR/nvim"               "$HOME/.config/nvim"
+symlink_item "$DOTFILES_DIR/tmux"               "$HOME/.config/tmux"
+
+echo "All dotfiles have been successfully linked!"
+echo "Note: If you are setting up Zsh for the first time, restart your terminal or run: source ~/.zshrc"
