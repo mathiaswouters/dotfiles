@@ -4,26 +4,19 @@ A streamlined, lightweight dotfiles configuration tailored to work seamlessly ac
 
 ## System Dependencies
 
-Your `.zshrc` configuration relies on several modern command-line utilities. Before running the setup script, ensure these are installed via your package manager:
+Your `.zshrc` configuration relies on several modern command-line utilities. Before running the setup script, ensure these are installed by running the `dependencies.sh` script:
 
-| Tool | macOS (`brew`) | Fedora (`dnf`) | Arch (`pacman`) | Debian/Ubuntu (`apt`) |
-| :--- | :--- | :--- | :--- | :--- |
-| **Zsh** | Built-in / `zsh` | `zsh` | `zsh` | `zsh` |
-| **Starship** | `starship` | `starship` | `starship` | *See note below* |
-| **Neovim** | `neovim` | `neovim` | `neovim` | `neovim` |
-| **Tmux** | `tmux` | `tmux` | `tmux` | `tmux` |
-| **Fzf** | `fzf` | `fzf` | `fzf` | `fzf` |
-| **Zoxide** | `zoxide` | `zoxide` | `zoxide` | `zoxide` |
-| **Fd** | `fd` | `fd-find` | `fd` | `fd-find` |
-| **Bat** | `bat` | `bat` | `bat` | `bat` |
-| **Eza** | `eza` | `eza` | `eza` | `eza` |
-| **Ripgrep** | `ripgrep` | `ripgrep` | `ripgrep` | `ripgrep` |
-| **Lf** | `lf` | `lf` | `lf` | *See note below* |
-
-> ⚠️ **Debian/Ubuntu Notes:** 
-> * **Starship:** Install via `curl -sS https://starship.rs/install.sh | sh`
-> * **Lf:** Best installed manually via the official binary releases on GitHub or via Go.
-> * **Eza:** Requires adding the official eza gpg/apt repository before running `apt install eza`.
+- **Zsh**
+- **Starship**
+- **Neovim**
+- **Tmux**
+- **Fzf**
+- **Zoxide**
+- **Fd**
+- **Bat**
+- **Eza**
+- **Ripgrep**
+- **Lf**
 
 ## Installation
 
@@ -33,9 +26,14 @@ Your `.zshrc` configuration relies on several modern command-line utilities. Bef
    cd ~/dotfiles
 ```
 
-2. Run the deployment script to safely symlink all configuration files to their appropriate targets:
+2. Run the dependencies script to install all required packages for your specific OS:
 ```bash
-   ./setup.sh
+   ./scripts/setup.sh
+```
+
+3. Run the deployment script to safely symlink all configuration files to their appropriate targets:
+```bash
+   ./scripts/setup.sh
 ```
 
 ## Repository Architecture
