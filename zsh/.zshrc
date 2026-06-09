@@ -71,34 +71,29 @@ zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'  # lowercase input matche
 # Fuzzy finder
 # =========================================================
 
-# macOS / Homebrew (Apple Silicon)
+# macOS (Apple Silicon)
 if [[ -f /opt/homebrew/opt/fzf/shell/key-bindings.zsh ]]; then
   source /opt/homebrew/opt/fzf/shell/key-bindings.zsh
-  source /opt/homebrew/opt/fzf/shell/completion.zsh
 fi
 
-# macOS / Homebrew (Intel)
+# macOS (Intel)
 if [[ -f /usr/local/opt/fzf/shell/key-bindings.zsh ]]; then
   source /usr/local/opt/fzf/shell/key-bindings.zsh
-  source /usr/local/opt/fzf/shell/completion.zsh
 fi
 
 # Fedora
 if [[ -f /usr/share/fzf/shell/key-bindings.zsh ]]; then
   source /usr/share/fzf/shell/key-bindings.zsh
-  source /usr/share/fzf/shell/completion.zsh
 fi
 
 # Arch
 if [[ -f /usr/share/fzf/key-bindings.zsh ]]; then
   source /usr/share/fzf/key-bindings.zsh
-  source /usr/share/fzf/completion.zsh
 fi
 
 # Ubuntu
 if [[ -f /usr/share/doc/fzf/examples/key-bindings.zsh ]]; then
   source /usr/share/doc/fzf/examples/key-bindings.zsh
-  source /usr/share/doc/fzf/examples/completion.zsh
 fi
 
 # =========================================================
@@ -136,6 +131,30 @@ export FZF_DEFAULT_OPTS='
 #   zle reset-prompt
 # }
 # zle -N _fzf_file_no_hidden
+
+# Ctrl+F: file picker excluding hidden files
+_fzf_file_no_hidden() {
+  local cmd result
+  cmd="${FZF_DEFAULT_COMMAND/--hidden /}"
+  result=$(eval "${cmd:-find . -type f}" | fzf) && LBUFFER+="$result"
+  zle reset-prompt
+}
+zle -N _fzf_file_no_hidden
+
+# =========================================================
+# Prompt
+# =========================================================
+
+# # Prevent Python virtualenv from polluting the prompt
+# export VIRTUAL_ENV_DISABLE_PROMPT=1
+
+FUNCNEST=100
+
+# Starship config location
+export STARSHIP_CONFIG="$HOME/.config/starship/starship.toml"
+
+# Initialize Starship
+eval "$(starship init zsh)"
 
 # =========================================================
 # Aliases
@@ -261,18 +280,3 @@ zvm_after_init() {
   bindkey '^[[A' history-substring-search-up
   bindkey '^[[B' history-substring-search-down
 }
-
-# =========================================================
-# Prompt
-# =========================================================
-
-# # Prevent Python virtualenv from polluting the prompt
-# export VIRTUAL_ENV_DISABLE_PROMPT=1
-
-FUNCNEST=100
-
-# Starship config location
-export STARSHIP_CONFIG="$HOME/.config/starship/starship.toml"
-
-# Initialize Starship
-eval "$(starship init zsh)"
