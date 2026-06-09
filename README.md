@@ -22,18 +22,20 @@ Your `.zshrc` configuration relies on several modern command-line utilities. Bef
 
 1. Clone this repository directly into your home directory:
 ```bash
-   git clone [https://github.com/mathiaswouters/dotfiles.git](https://github.com/mathiaswouters/dotfiles.git) ~/dotfiles
-   cd ~/dotfiles
+git clone https://github.com/mathiaswouters/dotfiles.git ~/dotfiles
+cd ~/dotfiles
+sudo chmod 700 scripts/dependencies.sh
+sudo chmod 700 scripts/setup.sh
 ```
 
 2. Run the dependencies script to install all required packages for your specific OS:
 ```bash
-   ./scripts/dependencies.sh
+./scripts/dependencies.sh
 ```
 
 3. Run the deployment script to safely symlink all configuration files to their appropriate targets:
 ```bash
-   ./scripts/setup.sh
+./scripts/setup.sh
 ```
 
 ## Repository Architecture
