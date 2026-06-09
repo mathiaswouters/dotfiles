@@ -272,7 +272,7 @@ zvm_after_init() {
 FUNCNEST=100
 
 # Starship config location
-export STARSHIP_CONFIG="$HOME/.config/starship/starship.conf"
+export STARSHIP_CONFIG="$HOME/.config/starship/starship.toml"
 
 # Initialize Starship
 eval "$(starship init zsh)"
