@@ -261,7 +261,7 @@ install_macos() {
     install_brew_pkg "fzf"
     install_brew_pkg "zoxide"
     install_brew_pkg "fd"
-    install_brew_pkg "bat"
+    # install_brew_pkg "bat"
     install_brew_pkg "ripgrep" "rg" "ripgrep"
     install_brew_pkg "lf"
 }
@@ -292,7 +292,7 @@ install_fedora() {
         fi
     fi
 
-    install_dnf_pkg "bat" "bat" "bat"
+    # install_dnf_pkg "bat" "bat" "bat"
     install_dnf_pkg "ripgrep" "rg" "ripgrep"
 
     if is_installed starship; then
@@ -337,7 +337,7 @@ install_arch() {
     install_pacman_pkg "fzf" "fzf" "fzf"
     install_pacman_pkg "zoxide" "zoxide" "zoxide"
     install_pacman_pkg "fd" "fd" "fd"
-    install_pacman_pkg "bat" "bat" "bat"
+    # install_pacman_pkg "bat" "bat" "bat"
     install_pacman_pkg "ripgrep" "rg" "ripgrep"
     install_pacman_pkg "lf" "lf" "lf"
 }
@@ -369,8 +369,8 @@ install_ubuntu() {
     # fd package installs command as fdfind on Debian/Ubuntu
     install_apt_pkg "fd" "fdfind" "fd-find"
 
-    # bat package installs command as batcat on Debian/Ubuntu
-    install_apt_pkg "bat" "batcat" "bat"
+    # # bat package installs command as batcat on Debian/Ubuntu
+    # install_apt_pkg "bat" "batcat" "bat"
 
     install_apt_pkg "ripgrep" "rg" "ripgrep"
 

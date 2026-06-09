@@ -27,12 +27,12 @@ export PATH="$HOME/.local/bin:$PATH"
 # GPG Signing (for Git)
 export GPG_TTY=$(tty)
 
-# Colorized Man Pages using bat
-if command -v bat >/dev/null 2>&1; then
-  export MANPAGER="bat -l man -p"
-elif command -v batcat >/dev/null 2>&1; then
-  export MANPAGER="batcat -l man -p"
-fi
+# # Colorized Man Pages using bat
+# if command -v bat >/dev/null 2>&1; then
+#   export MANPAGER="bat -l man -p"
+# elif command -v batcat >/dev/null 2>&1; then
+#   export MANPAGER="batcat -l man -p"
+# fi
 
 # XDG Base Directory Standards
 export XDG_CONFIG_HOME="$HOME/.config"
@@ -124,18 +124,18 @@ export FZF_DEFAULT_OPTS='
   --preview-window=right:65%:wrap:border-left
 '
 
-export _FZF_PREVIEW_CMD='bat --color=always --style=plain,numbers --line-range=:500 {}'
-export FZF_CTRL_T_OPTS="--preview '$_FZF_PREVIEW_CMD'"
+# export _FZF_PREVIEW_CMD='bat --color=always --style=plain,numbers --line-range=:500 {}'
+# export FZF_CTRL_T_OPTS="--preview '$_FZF_PREVIEW_CMD'"
 
-# Ctrl+F: file picker excluding hidden files
-_fzf_file_no_hidden() {
-  local cmd result
-  cmd="${FZF_DEFAULT_COMMAND/--hidden /}"
-  result=$(eval "${cmd:-find . -type f}" | fzf --preview "$_FZF_PREVIEW_CMD") \
-    && LBUFFER+="$result"  # LBUFFER is the text left of the cursor
-  zle reset-prompt
-}
-zle -N _fzf_file_no_hidden
+# # Ctrl+F: file picker excluding hidden files
+# _fzf_file_no_hidden() {
+#   local cmd result
+#   cmd="${FZF_DEFAULT_COMMAND/--hidden /}"
+#   result=$(eval "${cmd:-find . -type f}" | fzf --preview "$_FZF_PREVIEW_CMD") \
+#     && LBUFFER+="$result"  # LBUFFER is the text left of the cursor
+#   zle reset-prompt
+# }
+# zle -N _fzf_file_no_hidden
 
 # =========================================================
 # Aliases
@@ -145,13 +145,13 @@ zle -N _fzf_file_no_hidden
 alias ls='ls --color'
 alias ll='ls -l --color'
 
-# Better cat (bat on Arch, batcat on Ubuntu)
-if command -v bat >/dev/null 2>&1; then
-  alias cat='bat'
-elif command -v batcat >/dev/null 2>&1; then
-  alias bat='batcat'
-  alias cat='batcat'
-fi
+# # Better cat (bat on Arch, batcat on Ubuntu)
+# if command -v bat >/dev/null 2>&1; then
+#   alias cat='bat'
+# elif command -v batcat >/dev/null 2>&1; then
+#   alias bat='batcat'
+#   alias cat='batcat'
+# fi
 
 # fd (fdfind on Ubuntu)
 if command -v fdfind >/dev/null 2>&1; then
