@@ -14,7 +14,6 @@ Your `.zshrc` configuration relies on several modern command-line utilities. Bef
 - **Zoxide**
 - **Fd**
 - **Bat**
-- **Eza**
 - **Ripgrep**
 - **Lf**
 

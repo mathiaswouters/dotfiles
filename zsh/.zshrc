@@ -142,13 +142,8 @@ zle -N _fzf_file_no_hidden
 # =========================================================
 
 # Better ls
-alias ls='eza'
-alias ll='eza -lh --git'
-alias la='eza -lah --git'
-alias tree='eza --tree'
-
-# Reuse ls completions for eza (avoids defining a separate completion function)
-compdef eza=ls
+alias ls='ls --color'
+alias ll='ls -l --color'
 
 # Better cat (bat on Arch, batcat on Ubuntu)
 if command -v bat >/dev/null 2>&1; then

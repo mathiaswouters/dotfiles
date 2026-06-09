@@ -262,7 +262,6 @@ install_macos() {
     install_brew_pkg "zoxide"
     install_brew_pkg "fd"
     install_brew_pkg "bat"
-    install_brew_pkg "eza"
     install_brew_pkg "ripgrep" "rg" "ripgrep"
     install_brew_pkg "lf"
 }
@@ -294,7 +293,6 @@ install_fedora() {
     fi
 
     install_dnf_pkg "bat" "bat" "bat"
-    install_dnf_pkg "eza" "eza" "eza"
     install_dnf_pkg "ripgrep" "rg" "ripgrep"
 
     if is_installed starship; then
@@ -340,7 +338,6 @@ install_arch() {
     install_pacman_pkg "zoxide" "zoxide" "zoxide"
     install_pacman_pkg "fd" "fd" "fd"
     install_pacman_pkg "bat" "bat" "bat"
-    install_pacman_pkg "eza" "eza" "eza"
     install_pacman_pkg "ripgrep" "rg" "ripgrep"
     install_pacman_pkg "lf" "lf" "lf"
 }
@@ -389,35 +386,6 @@ install_ubuntu() {
         else
             fail "starship installation failed"
             mark_failed "starship"
-        fi
-    fi
-
-    # eza
-    if is_installed eza; then
-        ok "eza already installed"
-        mark_already_installed "eza"
-    else
-        if apt-cache show eza >/dev/null 2>&1; then
-            info "Installing eza..."
-            if sudo apt-get install -y eza; then
-                ok "eza installed successfully"
-                mark_installed_now "eza"
-            else
-                fail "eza installation failed"
-                mark_failed "eza"
-            fi
-        elif apt-cache show eza-cli >/dev/null 2>&1; then
-            info "Installing eza..."
-            if sudo apt-get install -y eza-cli; then
-                ok "eza installed successfully"
-                mark_installed_now "eza"
-            else
-                fail "eza installation failed"
-                mark_failed "eza"
-            fi
-        else
-            warn "eza not available in apt repositories, skipping"
-            mark_skipped "eza"
         fi
     fi
 
