@@ -97,6 +97,12 @@ exec /usr/libexec/polkit-mate-authentication-agent-1
 exec_always systemctl --user import-environment WAYLAND_DISPLAY XDG_CURRENT_DESKTOP
 exec_always dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP
 
+# Clipboard history (cliphist store) plus tray applets for Bluetooth and Wi-Fi.
+exec wl-paste --type text --watch cliphist store
+exec wl-paste --type image --watch cliphist store
+exec blueman-applet
+exec nm-applet --indicator
+
 ### Key bindings
 
 bindsym $mod+Return exec $term
@@ -187,6 +193,13 @@ bindsym --locked XF86AudioMute exec wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle
 bindsym --locked XF86AudioMicMute exec wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle
 bindsym --locked XF86MonBrightnessUp exec brightnessctl set 5%+
 bindsym --locked XF86MonBrightnessDown exec brightnessctl set 5%-
+bindsym --locked XF86AudioPlay exec playerctl play-pause
+bindsym --locked XF86AudioPause exec playerctl play-pause
+bindsym --locked XF86AudioNext exec playerctl next
+bindsym --locked XF86AudioPrev exec playerctl previous
+
+# Clipboard history picker (cliphist + wofi).
+bindsym $mod+Shift+v exec cliphist list | wofi --dmenu -p clipboard | cliphist decode | wl-copy
 
 ### Screenshots
 
@@ -202,6 +215,8 @@ bindsym $mod+Shift+n exec makoctl dismiss --all
 ### Window rules
 
 for_window [app_id="pavucontrol"] floating enable, resize set 800 600
+for_window [app_id="blueman-manager"] floating enable
+for_window [app_id="nm-connection-editor"] floating enable
 for_window [app_id="wofi"] floating enable
 for_window [window_role="pop-up"] floating enable
 for_window [window_role="dialog"] floating enable
