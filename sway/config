@@ -89,7 +89,7 @@ client.urgent           $red      $red      $base     $red      $red
 
 exec waybar
 exec mako
-exec /usr/libexec/polkit-gnome-authentication-agent-1
+exec /usr/libexec/polkit-mate-authentication-agent-1
 
 # Sway starts before the graphical session target on some setups, which leaves
 # xdg-desktop-portal-wlr without WAYLAND_DISPLAY and breaks screen sharing and
