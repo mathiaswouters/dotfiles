@@ -41,6 +41,20 @@ export XDG_DATA_HOME="$HOME/.local/share"
 export XDG_STATE_HOME="$HOME/.local/state"
 
 # =========================================================
+# Developer
+# =========================================================
+
+# Relocate Go
+export GOPATH="$HOME/.local/share/go"
+export GOCACHE="$HOME/.cache/go-build"
+
+# Relocate npm Global Binaries & Cache
+export NPM_CONFIG_USERCONFIG="$HOME/.local/share/npm/.npmrc"
+
+# Update your system PATH so you can actually run global Go/npm commands
+export PATH="$GOPATH/bin:$HOME/.local/share/npm/bin:$PATH"
+
+# =========================================================
 # Shell behaviour
 # =========================================================
 
