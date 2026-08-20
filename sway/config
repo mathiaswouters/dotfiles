@@ -1,0 +1,210 @@
+# Sway. Catppuccin Mocha, to match ghostty/config and starship.toml.
+# Keybindings stay vim-directional (hjkl) so sway, tmux and nvim agree.
+
+### Variables
+
+set $mod Mod4
+set $left h
+set $down j
+set $up k
+set $right l
+
+set $term ghostty
+set $menu wofi --show drun
+set $runner wofi --show run
+set $lock swaylock -f
+
+set $font JetBrains Mono 11
+
+# Catppuccin Mocha
+set $base    #1e1e2e
+set $mantle  #181825
+set $crust   #11111b
+set $text    #cdd6f4
+set $subtext #a6adc8
+set $surface #313244
+set $overlay #6c7086
+set $blue    #89b4fa
+set $lavender #b4befe
+set $red     #f38ba8
+set $peach   #fab387
+
+### Output
+
+# Wallpaper. A flat fill needs no extra package or image in the repo.
+output * bg $base solid_color
+
+# Per-machine output/input settings (resolution, scale, monitor position) do not
+# belong in git — a VM and a laptop disagree. Anything in this directory is
+# loaded last and wins. It lives outside ~/.config/sway because that path is a
+# symlink into the dotfiles repo.
+include ~/.config/sway-local/*.conf
+
+### Idle and lock
+
+# Dim to lock after 5 min, screen off at 10, and lock before sleep so the
+# session is never left unlocked on resume.
+exec swayidle -w \
+    timeout 300 '$lock' \
+    timeout 600 'swaymsg "output * power off"' \
+        resume 'swaymsg "output * power on"' \
+    before-sleep '$lock'
+
+### Input
+
+input type:keyboard {
+    xkb_layout us
+    xkb_options compose:ralt
+    repeat_delay 250
+    repeat_rate 40
+}
+
+input type:touchpad {
+    tap enabled
+    natural_scroll enabled
+    dwt enabled
+    click_method clickfinger
+    scroll_factor 0.4
+}
+
+### Appearance
+
+font pango:$font
+default_border pixel 2
+default_floating_border pixel 2
+gaps inner 6
+gaps outer 2
+smart_gaps on
+smart_borders on
+focus_follows_mouse no
+title_align center
+
+# class                 border   background indicator child_border
+client.focused          $lavender $surface  $text     $lavender $lavender
+client.focused_inactive $surface  $mantle   $subtext  $surface  $surface
+client.unfocused        $crust    $mantle   $overlay  $crust    $crust
+client.urgent           $red      $red      $base     $red      $red
+
+### Autostart
+
+exec waybar
+exec mako
+exec /usr/libexec/polkit-gnome-authentication-agent-1
+
+# Sway starts before the graphical session target on some setups, which leaves
+# xdg-desktop-portal-wlr without WAYLAND_DISPLAY and breaks screen sharing and
+# GTK file pickers. Push the variables into the user units, then activate.
+exec_always systemctl --user import-environment WAYLAND_DISPLAY XDG_CURRENT_DESKTOP
+exec_always dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP
+
+### Key bindings
+
+bindsym $mod+Return exec $term
+bindsym $mod+q kill
+bindsym $mod+d exec $menu
+bindsym $mod+Shift+d exec $runner
+bindsym $mod+Shift+e exec swaynag -t warning -m 'Exit sway?' -B 'Yes' 'swaymsg exit'
+bindsym $mod+Shift+c reload
+bindsym $mod+Escape exec $lock
+
+# Drag floating windows with the modifier held, resize with the right button.
+floating_modifier $mod normal
+
+# Focus
+bindsym $mod+$left focus left
+bindsym $mod+$down focus down
+bindsym $mod+$up focus up
+bindsym $mod+$right focus right
+bindsym $mod+Left focus left
+bindsym $mod+Down focus down
+bindsym $mod+Up focus up
+bindsym $mod+Right focus right
+
+# Move
+bindsym $mod+Shift+$left move left
+bindsym $mod+Shift+$down move down
+bindsym $mod+Shift+$up move up
+bindsym $mod+Shift+$right move right
+bindsym $mod+Shift+Left move left
+bindsym $mod+Shift+Down move down
+bindsym $mod+Shift+Up move up
+bindsym $mod+Shift+Right move right
+
+# Workspaces
+bindsym $mod+1 workspace number 1
+bindsym $mod+2 workspace number 2
+bindsym $mod+3 workspace number 3
+bindsym $mod+4 workspace number 4
+bindsym $mod+5 workspace number 5
+bindsym $mod+6 workspace number 6
+bindsym $mod+7 workspace number 7
+bindsym $mod+8 workspace number 8
+bindsym $mod+9 workspace number 9
+bindsym $mod+0 workspace number 10
+bindsym $mod+Tab workspace back_and_forth
+
+bindsym $mod+Shift+1 move container to workspace number 1
+bindsym $mod+Shift+2 move container to workspace number 2
+bindsym $mod+Shift+3 move container to workspace number 3
+bindsym $mod+Shift+4 move container to workspace number 4
+bindsym $mod+Shift+5 move container to workspace number 5
+bindsym $mod+Shift+6 move container to workspace number 6
+bindsym $mod+Shift+7 move container to workspace number 7
+bindsym $mod+Shift+8 move container to workspace number 8
+bindsym $mod+Shift+9 move container to workspace number 9
+bindsym $mod+Shift+0 move container to workspace number 10
+
+# Layout
+bindsym $mod+b splith
+bindsym $mod+v splitv
+bindsym $mod+s layout stacking
+bindsym $mod+w layout tabbed
+bindsym $mod+e layout toggle split
+bindsym $mod+f fullscreen
+bindsym $mod+Shift+space floating toggle
+bindsym $mod+space focus mode_toggle
+bindsym $mod+a focus parent
+
+# Scratchpad
+bindsym $mod+Shift+minus move scratchpad
+bindsym $mod+minus scratchpad show
+
+mode "resize" {
+    bindsym $left resize shrink width 10px
+    bindsym $down resize grow height 10px
+    bindsym $up resize shrink height 10px
+    bindsym $right resize grow width 10px
+    bindsym Return mode "default"
+    bindsym Escape mode "default"
+}
+bindsym $mod+r mode "resize"
+
+### Media and hardware keys
+
+bindsym --locked XF86AudioRaiseVolume exec wpctl set-volume -l 1.5 @DEFAULT_AUDIO_SINK@ 5%+
+bindsym --locked XF86AudioLowerVolume exec wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-
+bindsym --locked XF86AudioMute exec wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle
+bindsym --locked XF86AudioMicMute exec wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle
+bindsym --locked XF86MonBrightnessUp exec brightnessctl set 5%+
+bindsym --locked XF86MonBrightnessDown exec brightnessctl set 5%-
+
+### Screenshots
+
+# Region to clipboard, and whole output to clipboard with Shift.
+bindsym Print exec grim -g "$(slurp -d)" - | wl-copy
+bindsym Shift+Print exec grim - | wl-copy
+
+### Notifications
+
+bindsym $mod+n exec makoctl dismiss
+bindsym $mod+Shift+n exec makoctl dismiss --all
+
+### Window rules
+
+for_window [app_id="pavucontrol"] floating enable, resize set 800 600
+for_window [app_id="wofi"] floating enable
+for_window [window_role="pop-up"] floating enable
+for_window [window_role="dialog"] floating enable
+for_window [window_type="dialog"] floating enable
+
+include /etc/sway/config.d/*
