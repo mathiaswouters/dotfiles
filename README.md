@@ -2,6 +2,8 @@
 
 A streamlined, lightweight dotfiles configuration tailored to work seamlessly across macOS, Linux distributions (Fedora, Arch, Debian/Ubuntu), and WSL.
 
+**New to the Sway desktop?** Keybindings and how the layers nest: [CHEATSHEET.md](CHEATSHEET.md).
+
 ## System Dependencies
 
 The `.zshrc` relies on several modern command-line utilities. Install them for your OS with `scripts/dependencies.sh`:
