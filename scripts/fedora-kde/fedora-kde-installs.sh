@@ -66,8 +66,6 @@ flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.f
 # Install Spotify
 flatpak install -y flathub com.spotify.Client
 
-
-
 # Enable and start Docker service, add user to docker group
 sudo systemctl enable --now docker
 sudo usermod -aG docker $USER
