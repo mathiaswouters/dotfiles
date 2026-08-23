@@ -1,11 +1,11 @@
 # dnf group list --installed
-- admin-tools
-- desktop-accessibility
-- kde-apps
-- kde-desktop
-- kde-media
-- kde-pim
-- libreoffice
+- admin-tools --> KEEP !!!!
+- desktop-accessibility --> delete
+- kde-apps --> delete
+- kde-desktop --> KEEP !!!!
+- kde-media --> delete
+- kde-pim --> delete
+- libreoffice --> delete
 
 # Applications
 - akregator
