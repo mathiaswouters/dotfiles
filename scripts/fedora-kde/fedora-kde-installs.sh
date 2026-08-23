@@ -5,7 +5,6 @@ copr_repos:
   - atim/starship
   - pennbauman/ports           # lf
   - scottames/ghostty          # the source Ghostty's own docs point at
-  - herzen/davinci-helper      # Fedora installer/patcher; Resolve itself is not redistributable
   - alois-has-neurons/caligula # caligula
 
 base_packages:
@@ -28,34 +27,6 @@ base_packages:
   - bluez-tools            # Bluetooth CLI helpers
   - pciutils               # lspci / PCI device info
 
-# The Sway ecosystem itself — fill in / trim as you decide on each piece.
-# See APPS_INVENTORY.md for the "what does this category even need" list.
-sway_packages:
-  - sway                     # Wayland compositor (i3-compatible)
-  - swaylock                 # screen locker
-  - swayidle                 # idle timeouts (lock / sleep)
-  - swaybg                   # wallpaper setter
-  - waybar                   # status bar
-  - wofi                     # application launcher (or: fuzzel, rofi-wayland)
-  - mako                     # notification daemon
-  - grim                     # screenshots (Wayland)
-  - slurp                    # region/output picker for grim
-  - wl-clipboard             # Wayland clipboard (wl-copy / wl-paste)
-  - cliphist                 # clipboard history; Fedora 44+, COPR on older
-  - xdg-desktop-portal-wlr   # screen share / capture portal for wlroots
-  - xdg-desktop-portal-gtk   # file pickers for Firefox / Flatpak
-  - playerctl                # MPRIS media keys (play/pause/next)
-  - blueman                  # Bluetooth GUI and tray applet
-  - network-manager-applet   # nm-applet, sits in the waybar tray
-  - brightnessctl            # backlight / keyboard brightness
-  - mate-polkit              # polkit auth dialogs (privilege prompts)
-  - pipewire                 # audio/video server
-  - pipewire-pulseaudio      # PulseAudio compatibility for PipeWire
-  - wireplumber              # PipeWire session/policy manager
-  - pavucontrol              # volume / audio device GUI
-  # ghostty/config and waybar/style.css both ask for JetBrains Mono.
-  - jetbrains-mono-fonts     # monospace UI/terminal font
-
 # General desktop / productivity apps — placeholder list, prune to taste
 app_packages:
   - firefox                  # web browser
@@ -72,10 +43,6 @@ app_packages:
   - zoxide                   # smarter cd (learns directories)
   - lf                       # terminal file manager (pennbauman/ports COPR)
   - imv                      # image viewer (Wayland-friendly)
-  - thunar                   # GUI file manager
-  - tumbler                  # Thunar thumbnails
-  - thunar-volman            # automount removable media in Thunar
-  - thunar-archive-plugin    # compress/extract from Thunar
   - file-roller              # archive GUI used by the Thunar plugin
   - gvfs                     # virtual FS (trash, mounts, GVFS backends)
   - geany                    # lightweight GUI editor
@@ -91,33 +58,17 @@ app_packages:
   - python3-pip              # Python package installer
   - python3-devel            # headers for compiling Python extensions
   - golang                   # Go compiler and toolchain
-  # DaVinci Resolve is not in any public repo (Blackmagic login download).
-  # davinci-helper installs deps and runs the .zip you download from
-  # https://www.blackmagicdesign.com/products/davinciresolve
-  - davinci-helper           # helper to install DaVinci Resolve from Blackmagic's zip
-  - libxcrypt-compat         # glibc crypt compat (Resolve / older binaries)
-  - mesa-libGLU              # OpenGL utility library (Resolve dependency)
-
-# Official RPM, no yum repo. Downloaded once by the apps role.
-bitwarden_rpm_url: "https://vault.bitwarden.com/download/?app=desktop&platform=linux&variant=rpm"
+  - bitwarden_rpm_url
 
 # Not in Fedora/RPM Fusion. Flathub is added by the apps role.
 flatpak_apps:
   - com.spotify.Client       # Spotify desktop client
-
-# Official pkgs.k8s.io repos are per-minor. Bump this to pick up a new kubectl line.
-# https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/
-kubernetes_yum_minor: "v1.36"
 
 # Cloud/DevOps tooling relevant to your day job — extend freely
 devops_packages:
   - ansible-core             # Ansible (no extra collections)
   - terraform                # IaC CLI (HashiCorp repo, enabled in base)
   - kubectl                  # Kubernetes CLI (k8s.io repo, enabled in base)
-  - helm                     # Kubernetes package manager
-  - awscli2                  # AWS CLI v2
-  - podman                   # daemonless containers
-  - podman-compose           # Compose files for Podman
   - docker-ce                # Docker Engine (Docker Inc. repo, enabled in base)
   - docker-ce-cli            # Docker CLI
   - containerd.io            # container runtime used by Docker
