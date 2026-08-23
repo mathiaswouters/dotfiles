@@ -111,7 +111,6 @@ GUI_PACKAGES=(
   "alacritty"
   "imv"
   "file-roller"
-  "geany"
   "obs-studio"
   "code"
   "cursor"
