@@ -29,8 +29,34 @@ sudo dnf remove \
   gnome-abrt \
   kjournald
 
+# Remove packages
+sudo dnf remove \
+  akonadi-server \
+  mariadb-server mariadb \
+  qemu-guest-agent \
+  spice-vdagent \
+  hyperv-daemons \
+  open-vm-tools-desktop \
+  virtualbox-guest-additions \
+  zenity \
+  plymouth \
+  livesys-scripts \
+  plasma-workspace-wallpapers \
+  PackageKit \
+  PackageKit-command-not-found \
+  podman*
+
+# Cleanup
 sudo dnf autoremove
 sudo dnf clean all
+
+# Disable services
+sudo systemctl disable --now \
+  livesys.service livesys-late.service \
+  qemu-guest-agent.service \
+  vboxservice.service \
+  vmtoolsd.service vgauthd.service \
+  ModemManager.service
 
 echo "Remove Emoji Selector from application launcher:"
 echo "------------------------------------------------"
