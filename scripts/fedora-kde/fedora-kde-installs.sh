@@ -27,6 +27,9 @@ gpgcheck=1
 gpgkey=https://downloads.cursor.com/keys/anysphere.asc
 EOF
 
+# Sublime Text Repository
+sudo dnf config-manager addrepo --from-repofile=https://download.sublimetext.com/rpm/stable/x86_64/sublime-text.repo
+
 # HashiCorp (Terraform) Repository
 wget -O- https://rpm.releases.hashicorp.com/fedora/hashicorp.repo | sudo tee /etc/yum.repos.d/hashicorp.repo
 
@@ -48,7 +51,7 @@ sudo dnf install -y \
   vim git tmux zsh htop btop unzip tar rsync firewalld \
   NetworkManager-wifi iwd bluez bluez-tools pciutils \
   ghostty alacritty neovim fastfetch starship fzf ripgrep fd-find \
-  bat jq zoxide lf imv file-roller gvfs geany caligula obs-studio \
+  bat jq zoxide lf imv file-roller gvfs sublime-text caligula obs-studio \
   code cursor nodejs npm python3 python3-pip python3-devel golang \
   ansible-core terraform kubectl \
   docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin \
