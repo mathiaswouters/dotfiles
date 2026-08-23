@@ -18,7 +18,7 @@ set -euo pipefail
 
 # ---------- Config ----------
 TIMESTAMP=$(date +%Y%m%d-%H%M%S)
-REPORT="${HOME}/fedora-kde-system-scan-${TIMESTAMP}.md"
+REPORT="./fedora-kde-system-scan-${TIMESTAMP}.md"
 TMPDIR=$(mktemp -d)
 trap 'rm -rf "$TMPDIR"' EXIT
 
