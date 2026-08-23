@@ -28,10 +28,10 @@ gpgkey=https://downloads.cursor.com/keys/anysphere.asc
 EOF
 
 # HashiCorp (Terraform) Repository
-sudo dnf config-manager --add-repo https://rpm.releases.hashicorp.com/fedora/hashicorp.repo
+wget -O- https://rpm.releases.hashicorp.com/fedora/hashicorp.repo | sudo tee /etc/yum.repos.d/hashicorp.repo
 
 # Docker CE Repository
-sudo dnf config-manager --add-repo https://download.docker.com/linux/fedora/docker-ce.repo
+sudo dnf config-manager addrepo --from-repofile https://download.docker.com/linux/fedora/docker-ce.repo
 
 # Kubernetes (kubectl) Repository
 sudo sh -c 'cat <<EOF > /etc/yum.repos.d/kubernetes.repo
