@@ -1,62 +1,72 @@
-akregator
-ark
-Contact Print Theme Editor
-Contact Theme Editor
-Crashed Processes Viewer
-Discover Dolphin
-Dragon Player
-Elisa
-Emojie Selector
-Fedora Media Writer
-Filelight
-Firewall
-GnuPG Log Viewer
-Gwenvier
-Help Center
-Info Center
-Input Method Selector
-Journald Browser
-KAddressBook
-Kamoso
-KCalc
-KCharSelect
-KDE Connect
-KDE Connect SMS
-KDE Partition Manager
-KDebugSettings
-KFind
-Kleopatra
-KMahjongg
-KMail
-KMail Header Theme Editor
-Kmail import wizard
-KMines
-KMouth
-KolourPaint
-Konsole
-Kontact
-KOrganizer
-KPatience
-KRDC
-Krfb
-KTnef
-KWalletManager
-KWrite
-LibreOffice Calc
-LibreOffice Draw
-LibreOffice Impress
-LibreOffice Math
-LibreOffice Writer
-Menu Editor
-NeoChat
-Okular
-PIM Data Exporter
-Problem Reporting
-Qrca
-SELinux Troubleshooter
-Sieve Editor
-Skanpage
-Spectacle
-System Monitor
-System Settings
-Welcome Center
+# dnf group list --installed
+- admin-tools
+- desktop-accessibility
+- kde-apps
+- kde-desktop
+- kde-media
+- kde-pim
+- libreoffice
+
+# Applications
+- akregator
+- ark
+- Contact Print Theme Editor
+- Contact Theme Editor
+- Crashed Processes Viewer
+- Discover Dolphin
+- Dragon Player
+- Elisa
+- Emojie Selector
+- Fedora Media Writer
+- Filelight
+- Firewall
+- GnuPG Log Viewer
+- Gwenvier
+- Help Center
+- Info Center
+- Input Method Selector
+- Journald Browser
+- KAddressBook
+- Kamoso
+- KCalc
+- KCharSelect
+- KDE Connect
+- KDE Connect SMS
+- KDE Partition Manager
+- KDebugSettings
+- KFind
+- Kleopatra
+- KMahjongg
+- KMail
+- KMail Header Theme Editor
+- Kmail import wizard
+- KMines
+- KMouth
+- KolourPaint
+- Konsole
+- Kontact
+- KOrganizer
+- KPatience
+- KRDC
+- Krfb
+- KTnef
+- KWalletManager
+- KWrite
+- LibreOffice Calc
+- LibreOffice Draw
+- LibreOffice Impress
+- LibreOffice Math
+- LibreOffice Writer
+- Menu Editor
+- NeoChat
+- Okular
+- PIM Data Exporter
+- Problem Reporting
+- Qrca
+- SELinux Troubleshooter
+- Sieve Editor
+- Skanpage
+- Spectacle
+- System Monitor
+- System Settings
+- Welcome Centerv
