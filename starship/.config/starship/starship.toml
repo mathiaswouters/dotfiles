@@ -1,1 +1,154 @@
-# For inspiration look here: https://starship.rs/config/
+# Get editor completions based on the config schema
+"$schema" = 'https://starship.rs/config-schema.json'
+
+# Inserts a blank line between shell prompts for breathing room
+add_newline = true
+command_timeout = 1000
+
+# Layout setup inspired by the reference setup using your Dracula theme colors
+format = """$directory$git_branch$git_status$character"""
+right_format = """$golang$python$docker_context$terraform$kubernetes$aws$gcloud$azure$cmd_duration"""
+
+# --- 1. Left Side: Directory, Git & Character ---
+[directory]
+truncation_length = 3
+truncate_to_repo = true
+style = 'bold #bd93f9' # Dracula Purple
+format = '[$path]($style)[$read_only](red) '
+
+[directory.substitutions]
+'~/tests/starship-custom' = 'work-project'
+
+[git_branch]
+symbol = ' '
+style = 'bold #ff79c6' # Dracula Pink
+format = '[$symbol$branch(:$remote_branch)]($style)'
+
+[git_status]
+style = 'bold #ffb86c' # Dracula Orange
+format = '([\[$all_status$ahead_behind\]]($style) )'
+conflicted = '='
+ahead = '⇡${count}'
+behind = '⇣${count}'
+diverged = '⇡${ahead_count}⇣${behind_count}'
+up_to_date = ''
+untracked = '?'
+stashed = '$'
+modified = '!'
+staged = '+'
+renamed = '»'
+deleted = '✘'
+
+[character]
+success_symbol = '[❯](bold #50fa7b)' # Dracula Green
+error_symbol = '[❯](bold #ff5555)'   # Dracula Red
+vimcmd_symbol = '[N] >>>'
+
+# --- 2. Right Side: Compact Language & Container Symbols ---
+[golang]
+symbol = ' '
+style = 'bold #8be9fd' # Dracula Cyan
+format = '[$symbol$version]($style) '
+
+[python]
+symbol = ' '
+style = 'bold #f1fa8c' # Dracula Yellow
+format = '[$symbol$version(\($virtualenv\))]($style) '
+
+[docker_context]
+symbol = ' '
+style = 'bold #8be9fd' # Dracula Cyan
+format = '[$symbol$context]($style) '
+
+# --- 3. Right Side: Cloud, Infrastructure & Duration ---
+[terraform]
+symbol = '󱁢 '
+style = 'bold #bd93f9' # Dracula Purple
+format = '[$symbol$workspace( \($version\))]($style) '
+
+[kubernetes]
+disabled = false
+symbol = '󱃾 '
+style = 'bold #50fa7b' # Dracula Green
+# format = '[k8s:$context(\($namespace\))]($style) '
+format = '[$symbol$context(\($namespace\))]($style) '
+contexts = [
+  { context_pattern = ".*prod.*", style = "bold #ff5555", context_alias = "PROD" }, # Turns Dracula Red on prod!
+  { context_pattern = "arn:aws:eks:.*:cluster/(?P<cluster>[\\w-]+)", context_alias = "$cluster" },
+]
+
+[aws]
+disabled = false
+symbol = ' '
+style = 'bold #ffb86c' # Dracula Orange
+# Styled similarly to the inspiration photo for AWS profiles/regions
+format = '[$symbol(profile: "$profile" )(\(region: $region\) )]($style)'
+
+[gcloud]
+disabled = false
+symbol = '󱇶 '
+style = 'bold #8be9fd' # Dracula Cyan
+format = '[$symbol(account: "$account" )(\(project: $project\) )(\(region: $region\) )]($style)'
+
+[azure]
+disabled = false
+symbol = '󰠅 '
+style = 'bold #8be9fd' # Dracula Cyan
+format = '[$symbol(subscription: "$subscription" )]($style)'
+
+[cmd_duration]
+min_time = 2_000
+style = 'bold #6272a4' # Dracula Comment (Subtle grey-blue)
+format = '[$duration]($style)'
+
+# --- 4. Disable Unused Modules for Speed ---
+[package]
+disabled = true
+[c]
+disabled = true
+[cpp]
+disabled = true
+[bun]
+disabled = true
+[crystal]
+disabled = true
+[daml]
+disabled = true
+[dart]
+disabled = true
+[deno]
+disabled = true
+[dotnet]
+disabled = true
+[elixir]
+disabled = true
+[elm]
+disabled = true
+[erlang]
+disabled = true
+[java]
+disabled = true
+[julia]
+disabled = true
+[kotlin]
+disabled = true
+[lua]
+disabled = true
+[nim]
+disabled = true
+[nodejs]
+disabled = true
+[ocaml]
+disabled = true
+[perl]
+disabled = true
+[php]
+disabled = true
+[rust]
+disabled = true
+[scala]
+disabled = true
+[swift]
+disabled = true
+[zig]
+disabled = true
