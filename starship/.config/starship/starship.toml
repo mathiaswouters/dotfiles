@@ -22,7 +22,7 @@ format = '[$path]($style)[$read_only](red) '
 [git_branch]
 symbol = ' '
 style = 'bold #ff79c6' # Dracula Pink
-format = '[$symbol$branch(:$remote_branch)]($style)'
+format = '[$symbol$branch(:$remote_branch)]($style) '
 
 [git_status]
 style = 'bold #ffb86c' # Dracula Orange
