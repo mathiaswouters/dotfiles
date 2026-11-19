@@ -39,6 +39,10 @@ The dry run does not install Homebrew or packages. If GNU Stow is already instal
 
 AeroSpace is only deployed on macOS. Zsh, Ghostty, and Starship are treated as cross-platform packages.
 
+## Maintenance
+
+See [docs/MAINTAINING.md](docs/MAINTAINING.md) for guidance on adding dotfile packages, managing Stow links, updating Homebrew packages and runtimes, extending OS-specific bootstrap scripts, and testing changes safely.
+
 ## Notes
 
 - Run the script from a cloned copy of this repository; it does not clone the repository automatically.
