@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 
-SCRIPT_DIR="$(cd -- "$(dirname -- "\${BASH_SOURCE[0]}")" && pwd -P)"
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 BOOTSTRAP_DIR="$SCRIPT_DIR/bootstrap"
 
 MODE="full"
@@ -78,7 +78,7 @@ detect_os() {
   # shellcheck disable=SC1091
   . /etc/os-release
 
-  case "\${ID:-}" in
+  case "${ID:-}" in
     arch|manjaro|endeavouros)
       OS_TYPE="arch"
       ;;
@@ -89,7 +89,7 @@ detect_os() {
       OS_TYPE="fedora"
       ;;
     *)
-      case " \${ID_LIKE:-} " in
+      case " ${ID_LIKE:-} " in
         *" arch "*)
           OS_TYPE="arch"
           ;;
@@ -138,26 +138,17 @@ deploy_dotfiles() {
     packages+=(aerospace)
   fi
 
-  for package in "\${packages[@]}"; do
-    if [[ -d "$SCRIPT_DIR/$package" ]]; then
-      :
-    else
-      printf 'Warning: Stow package "%s" does not exist; skipping.\n' "$package" >&2
-      continue
-    fi
-  done
-
   local available_packages=()
-  for package in "\${packages[@]}"; do
+  for package in "${packages[@]}"; do
     [[ -d "$SCRIPT_DIR/$package" ]] && available_packages+=("$package")
   done
 
-  (("\${#available_packages[@]}")) || die "No Stow packages were found."
+  (("${#available_packages[@]}")) || die "No Stow packages were found."
 
   if ! command -v stow >/dev/null 2>&1; then
     if [[ "$DRY_RUN" == true ]]; then
       log "GNU Stow is not installed; cannot preview link operations."
-      printf 'Would stow: %s\n' "\${available_packages[*]}"
+      printf 'Would stow: %s\n' "${available_packages[*]}"
       return
     fi
     die "GNU Stow is required. Install it, then rerun ./setup.sh --dotfiles-only."
@@ -170,7 +161,7 @@ deploy_dotfiles() {
     printf 'Dry run: '
   fi
 
-  stow "\${stow_args[@]}" "\${available_packages[@]}"
+  stow "${stow_args[@]}" "${available_packages[@]}"
 }
 
 if [[ "$DRY_RUN" == true ]]; then
