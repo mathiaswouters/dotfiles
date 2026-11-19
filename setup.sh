@@ -1,57 +1,191 @@
-#!/bin/bash
-set -euo pipefail
+#!/usr/bin/env bash
+set -Eeuo pipefail
 
+SCRIPT_DIR="$(cd -- "$(dirname -- "\${BASH_SOURCE[0]}")" && pwd -P)"
+BOOTSTRAP_DIR="$SCRIPT_DIR/bootstrap"
 
-# Add docs folder in dotfiles repo --> this need to be ignored for stow
+MODE="full"
+DRY_RUN=false
+MODE_SELECTED=false
 
-## Add option to setup.sh script to skip bootstrap part and just run dotfiles / stow part
+usage() {
+  cat <<'EOF'
+Usage: ./setup.sh [OPTION]
 
+Run the complete workstation setup by default: bootstrap the OS, then deploy
+the dotfiles with GNU Stow.
 
+Options:
+  --bootstrap-only  Run OS-specific installation and configuration only.
+  --dotfiles-only   Deploy dotfiles with GNU Stow only.
+  --dry-run         Preview actions without changing the system.
+  -h, --help        Show this help message.
 
-# Detect the OS
-OS_TYPE="unknown"
+Examples:
+  ./setup.sh
+  ./setup.sh --dry-run
+  ./setup.sh --bootstrap-only
+  ./setup.sh --dotfiles-only
+EOF
+}
 
-if [[ "$OSTYPE" == "darwin"* ]]; then
+log() {
+  printf '\n==> %s\n' "$*"
+}
+
+die() {
+  printf 'Error: %s\n' "$*" >&2
+  exit 1
+}
+
+while (($#)); do
+  case "$1" in
+    --bootstrap-only)
+      [[ "$MODE_SELECTED" == false ]] || die "Choose only one setup mode."
+      MODE="bootstrap"
+      MODE_SELECTED=true
+      ;;
+    --dotfiles-only)
+      [[ "$MODE_SELECTED" == false ]] || die "Choose only one setup mode."
+      MODE="dotfiles"
+      MODE_SELECTED=true
+      ;;
+    --dry-run)
+      DRY_RUN=true
+      ;;
+    -h|--help)
+      usage
+      exit 0
+      ;;
+    *)
+      die "Unknown option: $1 (use --help for usage)."
+      ;;
+  esac
+  shift
+done
+
+detect_os() {
+  if [[ "$OSTYPE" == darwin* ]]; then
     OS_TYPE="macos"
-elif [[ -f /etc/os-release ]]; then
-    # Source the file to load variables like $ID and $ID_LIKE
-    . /etc/os-release
-    OS_TYPE="$ID"
+    return
+  fi
+
+  if [[ ! -r /etc/os-release ]]; then
+    OS_TYPE="unknown"
+    return
+  fi
+
+  # shellcheck disable=SC1091
+  . /etc/os-release
+
+  case "\${ID:-}" in
+    arch|manjaro|endeavouros)
+      OS_TYPE="arch"
+      ;;
+    debian|ubuntu|pop|linuxmint)
+      OS_TYPE="debian"
+      ;;
+    fedora|rhel|centos|rocky|almalinux)
+      OS_TYPE="fedora"
+      ;;
+    *)
+      case " \${ID_LIKE:-} " in
+        *" arch "*)
+          OS_TYPE="arch"
+          ;;
+        *" debian "*|*" ubuntu "*)
+          OS_TYPE="debian"
+          ;;
+        *" fedora "*|*" rhel "*)
+          OS_TYPE="fedora"
+          ;;
+        *)
+          OS_TYPE="unknown"
+          ;;
+      esac
+      ;;
+  esac
+}
+
+run_bootstrap() {
+  local script=""
+
+  case "$OS_TYPE" in
+    macos)  script="$BOOTSTRAP_DIR/macos.sh" ;;
+    arch)   script="$BOOTSTRAP_DIR/arch.sh" ;;
+    debian) script="$BOOTSTRAP_DIR/debian.sh" ;;
+    fedora) script="$BOOTSTRAP_DIR/fedora.sh" ;;
+    *)      die "Unsupported or unrecognized operating system." ;;
+  esac
+
+  [[ -f "$script" ]] || die "Bootstrap script not found: $script"
+
+  log "Running $OS_TYPE bootstrap"
+  if [[ "$DRY_RUN" == true ]]; then
+    bash "$script" --dry-run
+  else
+    bash "$script"
+  fi
+}
+
+deploy_dotfiles() {
+  local packages=()
+  local package
+
+  # AeroSpace is a macOS window manager; the other packages are cross-platform.
+  packages=(zsh ghostty starship)
+  if [[ "$OS_TYPE" == "macos" ]]; then
+    packages+=(aerospace)
+  fi
+
+  for package in "\${packages[@]}"; do
+    if [[ -d "$SCRIPT_DIR/$package" ]]; then
+      :
+    else
+      printf 'Warning: Stow package "%s" does not exist; skipping.\n' "$package" >&2
+      continue
+    fi
+  done
+
+  local available_packages=()
+  for package in "\${packages[@]}"; do
+    [[ -d "$SCRIPT_DIR/$package" ]] && available_packages+=("$package")
+  done
+
+  (("\${#available_packages[@]}")) || die "No Stow packages were found."
+
+  if ! command -v stow >/dev/null 2>&1; then
+    if [[ "$DRY_RUN" == true ]]; then
+      log "GNU Stow is not installed; cannot preview link operations."
+      printf 'Would stow: %s\n' "\${available_packages[*]}"
+      return
+    fi
+    die "GNU Stow is required. Install it, then rerun ./setup.sh --dotfiles-only."
+  fi
+
+  log "Deploying dotfiles with GNU Stow"
+  local stow_args=(--dir="$SCRIPT_DIR" --target="$HOME" --restow --verbose)
+  if [[ "$DRY_RUN" == true ]]; then
+    stow_args+=(--simulate)
+    printf 'Dry run: '
+  fi
+
+  stow "\${stow_args[@]}" "\${available_packages[@]}"
+}
+
+if [[ "$DRY_RUN" == true ]]; then
+  log "Dry-run mode enabled; no changes will be made."
 fi
 
-echo "Detected system: $OS_TYPE"
+detect_os
+log "Detected operating system: $OS_TYPE"
 
-# 2. Run OS-specific actions
-case "$OS_TYPE" in
-    macos)
-        echo "Running macOS tasks..."
-        # Example: brew update
-        ;;
-    debian|ubuntu|pop|linuxmint)
-        echo "Running Debian/Ubuntu-based tasks..."
-        # Example: sudo apt update
-        ;;
-    arch|manjaro|endeavouros)
-        echo "Running Arch-based tasks..."
-        # Example: sudo pacman -Syu
-        ;;
-    fedora|rhel|centos|rocky|almalinux)
-        echo "Running Fedora/RHEL-based tasks..."
-        # Example: sudo dnf check-update
-        ;;
-    *)
-        echo "Unsupported or unrecognized OS: $OS_TYPE"
-        exit 1
-        ;;
-esac
+if [[ "$MODE" != "dotfiles" ]]; then
+  run_bootstrap
+fi
 
-# 3. Run common tasks (runs on all supported systems)
-echo "Running cross-platform tasks..."
+if [[ "$MODE" != "bootstrap" ]]; then
+  deploy_dotfiles
+fi
 
-
-
-# Dotfiles stow
-
-cd "$(dirname "$0")"
-
-stow --restow */
+log "Setup complete."
