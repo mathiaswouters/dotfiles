@@ -19,7 +19,6 @@ CASKS=(
   "cap"
   "iina"
   "logi-options+"
-  "notion"
   "raycast"
   "vorssaint"
   "macshot"

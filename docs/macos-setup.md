@@ -37,7 +37,6 @@ brew install --cask nordvpn
 brew install --cask cap
 brew install --cask iina
 brew install --cask logi-options+
-brew install --cask notion
 brew install --cask raycast
 brew install --cask vorssaint
 brew install --cask macshot
