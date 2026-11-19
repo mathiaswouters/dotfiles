@@ -4,7 +4,7 @@ This guide explains how to keep the repository tidy as you add configuration fil
 
 ## 1. Understand the layout
 
-\`\`\`text
+```text
 dotfiles/
 ├── setup.sh                 # Main entrypoint, OS detection, and Stow deployment
 ├── bootstrap/
@@ -18,14 +18,14 @@ dotfiles/
 ├── zsh/                     # Stow package
 ├── docs/                    # Documentation; not a Stow package
 └── README.md
-\`\`\`
+```
 
 There are two separate responsibilities:
 
 - **Bootstrap scripts** install software and perform operating-system setup.
 - **GNU Stow packages** contain configuration files that should be linked into your home directory.
 
-Keep those responsibilities separate. For example, Homebrew installs Ghostty; the \`ghostty/\` Stow package manages its configuration.
+Keep those responsibilities separate. For example, Homebrew installs Ghostty; the `ghostty/` Stow package manages its configuration.
 
 ## 2. How GNU Stow packages work
 
@@ -33,33 +33,33 @@ Each top-level configuration directory is a Stow package. Its internal directory
 
 For example:
 
-\`\`\`text
+```text
 zsh/
 └── .zshrc
-\`\`\`
+```
 
-Stowing the \`zsh\` package creates:
+Stowing the `zsh` package creates:
 
-\`\`\`text
+```text
 ~/.zshrc -> <repository>/zsh/.zshrc
-\`\`\`
+```
 
-For configuration stored under \`~/.config\`, preserve that path inside the package:
+For configuration stored under `~/.config`, preserve that path inside the package:
 
-\`\`\`text
+```text
 ghostty/
 └── .config/
     └── ghostty/
         └── config
-\`\`\`
+```
 
 This becomes:
 
-\`\`\`text
+```text
 ~/.config/ghostty/config -> <repository>/ghostty/.config/ghostty/config
-\`\`\`
+```
 
-Do not put the literal home directory path (such as \`home/username\`) inside a package. The package root itself represents the home directory.
+Do not put the literal home directory path (such as `home/username`) inside a package. The package root itself represents the home directory.
 
 ## 3. Add a file to an existing dotfile package
 
@@ -73,12 +73,12 @@ Use this when you want to manage another configuration file for an application t
 
 Example: adding a Ghostty configuration file:
 
-\`\`\`bash
+```bash
 mkdir -p ghostty/.config/ghostty
 $EDITOR ghostty/.config/ghostty/config
 ./setup.sh --dotfiles-only --dry-run
 ./setup.sh --dotfiles-only
-\`\`\`
+```
 
 Because the destination is a symlink, editing the file through either the repository path or the linked home-directory path edits the same file.
 
@@ -92,52 +92,52 @@ For example, to add Git configuration:
 
 1. Create a package directory.
 2. Put the desired home-directory files inside it.
-3. Register the package in \`setup.sh\`.
+3. Register the package in `setup.sh`.
 4. Preview and apply Stow.
 
 Example layout:
 
-\`\`\`text
+```text
 git/
 ├── .gitconfig
 └── .config/
     └── git/
         └── ignore
-\`\`\`
+```
 
 These files map to:
 
-- \`~/.gitconfig\`
-- \`~/.config/git/ignore\`
+- `~/.gitconfig`
+- `~/.config/git/ignore`
 
-In \`setup.sh\`, find the \`deploy_dotfiles()\` function and add the package name to the appropriate package list:
+In `setup.sh`, find the `deploy_dotfiles()` function and add the package name to the appropriate package list:
 
-\`\`\`bash
+```bash
 packages=(zsh ghostty starship git)
 if [[ "$OS_TYPE" == "macos" ]]; then
   packages+=(aerospace)
 fi
-\`\`\`
+```
 
 If the package should only be deployed on macOS, add it to the macOS-specific list instead. If it should be deployed on every supported OS, add it to the common list.
 
 Then run:
 
-\`\`\`bash
+```bash
 ./setup.sh --dotfiles-only --dry-run
 ./setup.sh --dotfiles-only
-\`\`\`
+```
 
-**Important:** Creating a top-level directory does not automatically make it a Stow package. The package must be included in \`setup.sh\`'s explicit package list. This prevents folders such as \`bootstrap/\` and \`docs/\` from being stowed accidentally.
+**Important:** Creating a top-level directory does not automatically make it a Stow package. The package must be included in `setup.sh`'s explicit package list. This prevents folders such as `bootstrap/` and `docs/` from being stowed accidentally.
 
 ## 5. Add or remove macOS applications and CLI tools
 
-The package lists live near the top of \`bootstrap/macos.sh\`.
+The package lists live near the top of `bootstrap/macos.sh`.
 
-- \`TAPS\`: additional Homebrew taps.
-- \`FORMULAE\`: command-line tools and libraries installed with \`brew install\`.
-- \`CASKS\`: GUI applications and cask-distributed tools installed with \`brew install --cask\`.
-- \`MISE_RUNTIMES\`: language runtimes installed through Mise.
+- `TAPS`: additional Homebrew taps.
+- `FORMULAE`: command-line tools and libraries installed with `brew install`.
+- `CASKS`: GUI applications and cask-distributed tools installed with `brew install --cask`.
+- `MISE_RUNTIMES`: language runtimes installed through Mise.
 
 Add an item to the correct array. Keep one item per line and group related tools with comments.
 
@@ -146,11 +146,11 @@ Before adding a package:
 1. Check its current installation name in the official [Homebrew Formulae](https://formulae.brew.sh/) website.
 2. Check whether it is a formula or a cask; the arrays use different install commands.
 3. Check platform and architecture requirements.
-4. If it comes from a third-party tap, add that tap to \`TAPS\` before the package is installed.
+4. If it comes from a third-party tap, add that tap to `TAPS` before the package is installed.
 
 For example:
 
-\`\`\`bash
+```bash
 FORMULAE=(
   # Existing tools...
   "ripgrep"
@@ -163,7 +163,7 @@ CASKS=(
   "ghostty"
   "new-desktop-app"
 )
-\`\`\`
+```
 
 The script checks whether each item is already installed before attempting installation. Installation failures stop the bootstrap so a partially completed setup is not reported as successful.
 
@@ -171,34 +171,34 @@ Remove an item from the relevant array when you no longer want the bootstrap to 
 
 ### Mise runtimes
 
-Add runtimes to \`MISE_RUNTIMES\`, using Mise's tool/version syntax, for example:
+Add runtimes to `MISE_RUNTIMES`, using Mise's tool/version syntax, for example:
 
-\`\`\`bash
+```bash
 MISE_RUNTIMES=(
   "node@lts"
   "python@latest"
   "go@latest"
   "java@latest"
 )
-\`\`\`
+```
 
-The current use of \`latest\` is convenient but not fully reproducible: a fresh setup at a later date may install a newer version. Pin a version when you need consistent environments.
+The current use of `latest` is convenient but not fully reproducible: a fresh setup at a later date may install a newer version. Pin a version when you need consistent environments.
 
 ## 6. Add or change OS-specific setup
 
-The main entrypoint detects the operating system and selects one script from \`bootstrap/\`.
+The main entrypoint detects the operating system and selects one script from `bootstrap/`.
 
-- macOS: \`bootstrap/macos.sh\`
-- Arch: \`bootstrap/arch.sh\`
-- Debian/Ubuntu: \`bootstrap/debian.sh\`
-- Fedora: \`bootstrap/fedora.sh\`
+- macOS: `bootstrap/macos.sh`
+- Arch: `bootstrap/arch.sh`
+- Debian/Ubuntu: `bootstrap/debian.sh`
+- Fedora: `bootstrap/fedora.sh`
 
 When adding another supported distribution:
 
 1. Create its bootstrap script.
 2. Keep it responsible for OS-specific package installation and configuration only.
-3. Add or update the OS detection and dispatch logic in \`setup.sh\`.
-4. Do not add Stow deployment to the platform script. The main \`setup.sh\` owns that step.
+3. Add or update the OS detection and dispatch logic in `setup.sh`.
+4. Do not add Stow deployment to the platform script. The main `setup.sh` owns that step.
 5. Decide which dotfile packages are common and which are platform-specific.
 
 Keep platform scripts safe to rerun where possible. Check whether a package or setting is already present before changing it, and make failures visible.
@@ -207,7 +207,7 @@ Keep platform scripts safe to rerun where possible. Check whether a package or s
 
 Run these checks after editing shell scripts:
 
-\`\`\`bash
+```bash
 # Check shell syntax
 bash -n setup.sh
 bash -n bootstrap/macos.sh
@@ -217,21 +217,21 @@ bash -n bootstrap/macos.sh
 
 # Preview only dotfile links
 ./setup.sh --dotfiles-only --dry-run
-\`\`\`
+```
 
 If ShellCheck is installed, also run:
 
-\`\`\`bash
+```bash
 shellcheck setup.sh bootstrap/*.sh
-\`\`\`
+```
 
 A dry run is a preview, not a guarantee that every package will install successfully. It does not perform a full Homebrew installation test.
 
 After reviewing the preview, run the relevant real command. For a normal workstation setup:
 
-\`\`\`bash
+```bash
 ./setup.sh
-\`\`\`
+```
 
 ## 8. Maintain existing Stow links
 
@@ -239,17 +239,17 @@ When you change a file already managed by Stow, the change is immediately reflec
 
 When you add, move, or remove files inside a package, re-stow that package so the links are reconciled:
 
-\`\`\`bash
+```bash
 stow --dir="$PWD" --target="$HOME" --restow zsh
-\`\`\`
+```
 
 To remove a package's managed links:
 
-\`\`\`bash
+```bash
 stow --dir="$PWD" --target="$HOME" --delete zsh
-\`\`\`
+```
 
-Replace \`zsh\` with the package name you intend to manage. Review the result before deleting or moving repository files.
+Replace `zsh` with the package name you intend to manage. Review the result before deleting or moving repository files.
 
 ## 9. Keep secrets and machine-specific state out of Git
 
@@ -270,11 +270,11 @@ For routine changes:
 
 1. Pull the latest repository changes.
 2. Create or edit the relevant package/configuration.
-3. Update \`setup.sh\` if you created a new Stow package.
-4. Update \`bootstrap/macos.sh\` if you added or removed a macOS application, formula, tap, or runtime.
+3. Update `setup.sh` if you created a new Stow package.
+4. Update `bootstrap/macos.sh` if you added or removed a macOS application, formula, tap, or runtime.
 5. Run syntax checks and the dry run.
 6. Apply the relevant setup command.
 7. Verify the application and configuration work.
 8. Commit the change with a message describing what changed.
 
-Keep this guide and the main \`README.md\` up to date whenever the setup workflow or repository layout changes.
+Keep this guide and the main `README.md` up to date whenever the setup workflow or repository layout changes.
