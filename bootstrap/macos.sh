@@ -131,12 +131,14 @@ ZPROFILE="\${ZDOTDIR:-$HOME}/.zprofile"
 BREW_SHELLENV="eval \"\$($BREW_BIN shellenv zsh)\""
 
 log "Configuring Homebrew shell environment"
-mkdir -p "$(dirname "$ZPROFILE")"
-touch "$ZPROFILE"
-if ! grep -Fqx "$BREW_SHELLENV" "$ZPROFILE"; then
-  if [[ "$DRY_RUN" == true ]]; then
+if [[ "$DRY_RUN" == true ]]; then
+  if [[ ! -f "$ZPROFILE" ]] || ! grep -Fqx "$BREW_SHELLENV" "$ZPROFILE"; then
     printf 'Would add Homebrew shell initialization to %s\n' "$ZPROFILE"
-  else
+  fi
+else
+  mkdir -p "$(dirname "$ZPROFILE")"
+  touch "$ZPROFILE"
+  if ! grep -Fqx "$BREW_SHELLENV" "$ZPROFILE"; then
     printf '\n%s\n' "$BREW_SHELLENV" >> "$ZPROFILE"
   fi
 fi
