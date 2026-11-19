@@ -77,7 +77,7 @@ MISE_RUNTIMES=(
 )
 
 DRY_RUN=false
-if [[ "\${1:-}" == "--dry-run" ]]; then
+if [[ "${1:-}" == "--dry-run" ]]; then
   DRY_RUN=true
 elif (($#)); then
   printf 'Error: unsupported argument: %s\n' "$1" >&2
@@ -105,10 +105,10 @@ if ! BREW_BIN="$(find_brew)"; then
   if [[ "$DRY_RUN" == true ]]; then
     log "Homebrew is not installed."
     printf 'Would install Homebrew using the official installer.\n'
-    printf 'Would install formulae: %s\n' "\${FORMULAE[*]}"
-    printf 'Would install casks: %s\n' "\${CASKS[*]}"
-    printf 'Would add taps: %s\n' "\${TAPS[*]}"
-    printf 'Would install mise runtimes: %s\n' "\${MISE_RUNTIMES[*]}"
+    printf 'Would install formulae: %s\n' "${FORMULAE[*]}"
+    printf 'Would install casks: %s\n' "${CASKS[*]}"
+    printf 'Would add taps: %s\n' "${TAPS[*]}"
+    printf 'Would install mise runtimes: %s\n' "${MISE_RUNTIMES[*]}"
     exit 0
   fi
 
@@ -127,7 +127,7 @@ if ! BREW_BIN="$(find_brew)"; then
 fi
 
 BREW_PREFIX="$("$BREW_BIN" --prefix)"
-ZPROFILE="\${ZDOTDIR:-$HOME}/.zprofile"
+ZPROFILE="${ZDOTDIR:-$HOME}/.zprofile"
 BREW_SHELLENV="eval \"\$($BREW_BIN shellenv zsh)\""
 
 log "Configuring Homebrew shell environment"
@@ -159,7 +159,7 @@ else
 fi
 
 log "Adding Homebrew taps"
-for tap in "\${TAPS[@]}"; do
+for tap in "${TAPS[@]}"; do
   if "$BREW_BIN" tap | grep -Fxq "$tap"; then
     printf 'Already tapped: %s\n' "$tap"
   elif [[ "$DRY_RUN" == true ]]; then
@@ -170,7 +170,7 @@ for tap in "\${TAPS[@]}"; do
 done
 
 log "Installing CLI formulae"
-for formula in "\${FORMULAE[@]}"; do
+for formula in "${FORMULAE[@]}"; do
   if "$BREW_BIN" list --formula "$formula" >/dev/null 2>&1; then
     printf 'Already installed: %s\n' "$formula"
   elif [[ "$DRY_RUN" == true ]]; then
@@ -181,7 +181,7 @@ for formula in "\${FORMULAE[@]}"; do
 done
 
 log "Installing GUI applications"
-for cask in "\${CASKS[@]}"; do
+for cask in "${CASKS[@]}"; do
   if "$BREW_BIN" list --cask "$cask" >/dev/null 2>&1; then
     printf 'Already installed: %s\n' "$cask"
   elif [[ "$DRY_RUN" == true ]]; then
@@ -218,9 +218,9 @@ fi
 
 log "Installing language runtimes with mise"
 if [[ "$DRY_RUN" == true ]]; then
-  printf 'Would install runtimes: %s\n' "\${MISE_RUNTIMES[*]}"
+  printf 'Would install runtimes: %s\n' "${MISE_RUNTIMES[*]}"
 elif command -v mise >/dev/null 2>&1; then
-  for runtime in "\${MISE_RUNTIMES[@]}"; do
+  for runtime in "${MISE_RUNTIMES[@]}"; do
     mise use --global "$runtime"
   done
 else
