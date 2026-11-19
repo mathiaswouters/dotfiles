@@ -2,7 +2,7 @@
 set -euo pipefail
 
 
-# Add docs folder in dotfiles repo --> this need to be ignored for stow --> in here put mac config guide and remove mac-setup repo
+# Add docs folder in dotfiles repo --> this need to be ignored for stow
 
 ## Add option to setup.sh script to skip bootstrap part and just run dotfiles / stow part
 

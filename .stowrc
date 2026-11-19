@@ -1,5 +1,0 @@
---target=~
---ignore=.stowrc
---ignore=README.md
---ignore=setup.sh
---ignore=.DS_Store
