@@ -1,61 +1,9 @@
-#!/bin/bash
-set -euo pipefail
+#!/usr/bin/env bash
+set -Eeuo pipefail
 
-# Prevent Homebrew and its installer from pausing for interactive prompts
+# Homebrew's installer supports NONINTERACTIVE=1. The installer itself may
+# still require confirmation when run interactively.
 export NONINTERACTIVE=1
-
-# ------------------------------------------
-# Post-Install Configuration (Customize Me)
-# ------------------------------------------
-DOTFILES_REPO="" # e.g., "https://github.com"
-DOTFILES_DIR="$HOME/.dotfiles"
-STOW_PACKAGES=("zsh" "ghostty" "tmux" "nvim" "starship" "aerospace")
-
-# Used if your dotfiles don't already include a mise config or .tool-versions
-MISE_RUNTIMES=(
-  "node@lts"
-  "python@latest"
-  "go@latest"
-)
-
-echo "=========================================="
-echo " Starting macOS bootstrap script..."
-echo "=========================================="
-
-# Ask for the administrator password upfront
-echo "Please enter your macOS password once to allow installations..."
-sudo -v
-
-# Keep-alive: update existing `sudo` time stamp until the script has finished
-while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
-
-# Install Homebrew (also handles headless Xcode Command Line Tools installation)
-if ! command -v brew &>/dev/null && ! [[ -x "/opt/homebrew/bin/brew" ]]; then
-    echo "Installing Homebrew..."
-    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-else
-    echo "Homebrew already installed"
-fi
-
-# Add Homebrew to PATH if not already in .zprofile
-ZPROFILE="${ZDOTDIR:-$HOME}/.zprofile"
-BREW_SHELLENV='eval "$(/opt/homebrew/bin/brew shellenv zsh)"'
-
-if ! grep -qsF "$BREW_SHELLENV" "$ZPROFILE"; then
-    echo >> "$ZPROFILE"
-    echo "$BREW_SHELLENV" >> "$ZPROFILE"
-fi
-eval "$(/opt/homebrew/bin/brew shellenv zsh)"
-
-brew analytics off
-
-# Ensure Homebrew is up to date
-echo -e "\n==> Updating Homebrew..."
-brew update
-
-# ------------------------------------------
-# Package Lists
-# ------------------------------------------
 
 TAPS=(
   "hashicorp/tap"
@@ -85,7 +33,7 @@ CASKS=(
 )
 
 FORMULAE=(
-  # Terminal - CLI utilities
+  # Terminal and CLI utilities
   "zsh"
   "wget"
   "tree"
@@ -105,7 +53,7 @@ FORMULAE=(
   "zoxide"
   "superfile"
 
-  # Dev tools
+  # Development tools
   "git"
   "mise"
   "docker"
@@ -122,126 +70,160 @@ FORMULAE=(
   "awscli"
 )
 
-# ------------------------------------------
-# Installation Loops
-# ------------------------------------------
+MISE_RUNTIMES=(
+  "node@lts"
+  "python@latest"
+  "go@latest"
+)
 
-echo -e "\n==> Adding Taps..."
-for tap in "${TAPS[@]}"; do
-  echo "--> Tapping $tap..."
-  brew tap "$tap"
-done
-
-echo -e "\n==> Installing CLI Formulae..."
-for formula in "${FORMULAE[@]}"; do
-  if brew list --formula "$formula" &>/dev/null; then
-    echo "✓ $formula is already installed. Skipping..."
-  else
-    echo "--> Installing $formula..."
-    brew install "$formula" || echo "⚠️ Failed to install $formula"
-  fi
-done
-
-echo -e "\n==> Installing GUI Apps & Casks..."
-for cask in "${CASKS[@]}"; do
-  if brew list --cask "$cask" &>/dev/null; then
-    echo "✓ $cask is already installed. Skipping..."
-  else
-    echo "--> Installing $cask..."
-    brew install --cask "$cask" || echo "⚠️ Failed to install $cask"
-  fi
-done
-
-
-
-
-
-
-
-
-
-
-# ------------------------------------------
-# Post-Install: Dotfiles & Stow
-# ------------------------------------------
-echo -e "\n==> Setting up Dotfiles..."
-if [[ -n "$DOTFILES_REPO" ]]; then
-  if [[ ! -d "$DOTFILES_DIR" ]]; then
-    echo "--> Cloning dotfiles from $DOTFILES_REPO..."
-    git clone "$DOTFILES_REPO" "$DOTFILES_DIR"
-  else
-    echo "--> Updating existing dotfiles in $DOTFILES_DIR..."
-    git -C "$DOTFILES_DIR" pull --ff-only || echo "⚠️ Could not fast-forward dotfiles"
-  fi
-
-  for pkg in "${STOW_PACKAGES[@]}"; do
-    if [[ -d "$DOTFILES_DIR/$pkg" ]]; then
-      echo "--> Stowing $pkg..."
-      stow --dir="$DOTFILES_DIR" --target="$HOME" --restow "$pkg"
-    else
-      echo "⚠️ Stow package '$pkg' not found in $DOTFILES_DIR, skipping..."
-    fi
-  done
-else
-  echo "--> DOTFILES_REPO is empty. Skipping git clone and stow."
+DRY_RUN=false
+if [[ "\${1:-}" == "--dry-run" ]]; then
+  DRY_RUN=true
+elif (($#)); then
+  printf 'Error: unsupported argument: %s\n' "$1" >&2
+  exit 1
 fi
 
-# ------------------------------------------
-# Post-Install: Zsh & CLI Tool Hooks
-# ------------------------------------------
-echo -e "\n==> Configuring Zsh..."
-BREW_ZSH="/opt/homebrew/bin/zsh"
+log() {
+  printf '\n==> %s\n' "$*"
+}
 
-if [[ -x "$BREW_ZSH" ]]; then
-  if ! grep -qsF "$BREW_ZSH" /etc/shells; then
-    echo "--> Adding $BREW_ZSH to /etc/shells..."
-    echo "$BREW_ZSH" | sudo tee -a /etc/shells >/dev/null
-  fi
-
-  if [[ "$SHELL" != "$BREW_ZSH" ]]; then
-    echo "--> Changing default shell to $BREW_ZSH..."
-    sudo chsh -s "$BREW_ZSH" "$USER"
-  fi
-fi
-
-ZSHRC="${ZDOTDIR:-$HOME}/.zshrc"
-touch "$ZSHRC"
-
-# Helper to append a line to .zshrc only if it isn't already there
-add_to_zshrc() {
-  local line="$1"
-  if ! grep -qsF "$line" "$ZSHRC"; then
-    echo "$line" >> "$ZSHRC"
+find_brew() {
+  if command -v brew >/dev/null 2>&1; then
+    command -v brew
+  elif [[ -x /opt/homebrew/bin/brew ]]; then
+    printf '%s\n' /opt/homebrew/bin/brew
+  elif [[ -x /usr/local/bin/brew ]]; then
+    printf '%s\n' /usr/local/bin/brew
+  else
+    return 1
   fi
 }
 
-echo "--> Ensuring CLI tool initializations exist in $ZSHRC..."
-add_to_zshrc ''
-add_to_zshrc '# Tool initializations'
-add_to_zshrc 'eval "$(mise activate zsh)"'
-add_to_zshrc 'eval "$(starship init zsh)"'
-add_to_zshrc 'eval "$(zoxide init zsh)"'
-add_to_zshrc 'eval "$(atuin init zsh)"'
-add_to_zshrc 'source <(fzf --zsh)'
+BREW_BIN=""
+if ! BREW_BIN="$(find_brew)"; then
+  if [[ "$DRY_RUN" == true ]]; then
+    log "Homebrew is not installed."
+    printf 'Would install Homebrew using the official installer.\n'
+    printf 'Would install formulae: %s\n' "\${FORMULAE[*]}"
+    printf 'Would install casks: %s\n' "\${CASKS[*]}"
+    printf 'Would add taps: %s\n' "\${TAPS[*]}"
+    printf 'Would install mise runtimes: %s\n' "\${MISE_RUNTIMES[*]}"
+    exit 0
+  fi
 
-# ------------------------------------------
-# Post-Install: Mise Runtimes
-# ------------------------------------------
-echo -e "\n==> Installing Runtimes via Mise..."
-if [[ -f "$HOME/.config/mise/config.toml" || -f "$HOME/.tool-versions" ]]; then
-  echo "--> Found existing mise config from dotfiles. Running mise install..."
-  mise install
-else
-  for runtime in "${MISE_RUNTIMES[@]}"; do
-    echo "--> Installing global runtime: $runtime..."
-    mise use --global "$runtime"
-  done
+  command -v curl >/dev/null 2>&1 || {
+    printf 'Error: curl is required to install Homebrew.\n' >&2
+    exit 1
+  }
+
+  log "Installing Homebrew"
+  /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+  BREW_BIN="$(find_brew)" || {
+    printf 'Error: Homebrew installer finished, but brew was not found.\n' >&2
+    exit 1
+  }
 fi
 
-echo -e "\n==> Cleaning up old versions..."
-brew cleanup
+BREW_PREFIX="$("$BREW_BIN" --prefix)"
+ZPROFILE="\${ZDOTDIR:-$HOME}/.zprofile"
+BREW_SHELLENV="eval \"\$($BREW_BIN shellenv zsh)\""
 
-echo "=========================================="
-echo " All installations & setup complete!"
-echo " Restart your terminal to apply changes."
-echo "=========================================="
+log "Configuring Homebrew shell environment"
+mkdir -p "$(dirname "$ZPROFILE")"
+touch "$ZPROFILE"
+if ! grep -Fqx "$BREW_SHELLENV" "$ZPROFILE"; then
+  if [[ "$DRY_RUN" == true ]]; then
+    printf 'Would add Homebrew shell initialization to %s\n' "$ZPROFILE"
+  else
+    printf '\n%s\n' "$BREW_SHELLENV" >> "$ZPROFILE"
+  fi
+fi
+
+if [[ "$DRY_RUN" == false ]]; then
+  # Make Homebrew available to the rest of this script immediately.
+  eval "$("$BREW_BIN" shellenv zsh)"
+fi
+
+if [[ "$DRY_RUN" == false ]]; then
+  log "Disabling Homebrew analytics"
+  "$BREW_BIN" analytics off
+
+  log "Updating Homebrew"
+  "$BREW_BIN" update
+else
+  log "Would disable Homebrew analytics and update Homebrew"
+fi
+
+log "Adding Homebrew taps"
+for tap in "\${TAPS[@]}"; do
+  if "$BREW_BIN" tap | grep -Fxq "$tap"; then
+    printf 'Already tapped: %s\n' "$tap"
+  elif [[ "$DRY_RUN" == true ]]; then
+    printf 'Would tap: %s\n' "$tap"
+  else
+    "$BREW_BIN" tap "$tap"
+  fi
+done
+
+log "Installing CLI formulae"
+for formula in "\${FORMULAE[@]}"; do
+  if "$BREW_BIN" list --formula "$formula" >/dev/null 2>&1; then
+    printf 'Already installed: %s\n' "$formula"
+  elif [[ "$DRY_RUN" == true ]]; then
+    printf 'Would install formula: %s\n' "$formula"
+  else
+    "$BREW_BIN" install "$formula"
+  fi
+done
+
+log "Installing GUI applications"
+for cask in "\${CASKS[@]}"; do
+  if "$BREW_BIN" list --cask "$cask" >/dev/null 2>&1; then
+    printf 'Already installed: %s\n' "$cask"
+  elif [[ "$DRY_RUN" == true ]]; then
+    printf 'Would install cask: %s\n' "$cask"
+  else
+    "$BREW_BIN" install --cask "$cask"
+  fi
+done
+
+log "Configuring the default Zsh shell"
+BREW_ZSH="$BREW_PREFIX/bin/zsh"
+if [[ -x "$BREW_ZSH" ]]; then
+  if grep -Fqx "$BREW_ZSH" /etc/shells; then
+    :
+  elif [[ "$DRY_RUN" == true ]]; then
+    printf 'Would add %s to /etc/shells (requires administrator privileges).\n' "$BREW_ZSH"
+  else
+    printf '%s\n' "$BREW_ZSH" | sudo tee -a /etc/shells >/dev/null
+  fi
+
+  CURRENT_LOGIN_SHELL="$(dscl . -read "/Users/$(id -un)" UserShell 2>/dev/null | awk '{print $2}' || true)"
+  if [[ "$CURRENT_LOGIN_SHELL" != "$BREW_ZSH" ]]; then
+    if [[ "$DRY_RUN" == true ]]; then
+      printf 'Would change the login shell to %s.\n' "$BREW_ZSH"
+    else
+      sudo chsh -s "$BREW_ZSH" "$(id -un)"
+    fi
+  else
+    printf 'Default shell is already %s\n' "$BREW_ZSH"
+  fi
+else
+  printf 'Warning: Homebrew Zsh was not found at %s; leaving the login shell unchanged.\n' "$BREW_ZSH" >&2
+fi
+
+log "Installing language runtimes with mise"
+if [[ "$DRY_RUN" == true ]]; then
+  printf 'Would install runtimes: %s\n' "\${MISE_RUNTIMES[*]}"
+elif command -v mise >/dev/null 2>&1; then
+  for runtime in "\${MISE_RUNTIMES[@]}"; do
+    mise use --global "$runtime"
+  done
+else
+  printf 'Warning: mise is not available; skipping runtime installation.\n' >&2
+fi
+
+log "macOS bootstrap complete."
+printf 'Dotfiles will be deployed separately by setup.sh.\n'
