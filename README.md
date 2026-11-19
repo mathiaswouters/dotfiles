@@ -6,15 +6,15 @@ Personal workstation configuration managed with [GNU Stow](https://www.gnu.org/s
 
 Clone the repository, enter it, and run the setup script:
 
-\`\`\`bash
+```bash
 git clone https://github.com/mathiaswouters/dotfiles.git
 cd dotfiles
 ./setup.sh
-\`\`\`
+```
 
 By default, setup performs both steps in order:
 
-1. Detects the operating system and runs the matching script in \`bootstrap/\`.
+1. Detects the operating system and runs the matching script in `bootstrap/`.
 2. Deploys the supported dotfile packages to your home directory with GNU Stow.
 
 On macOS, the bootstrap installs and configures Homebrew, command-line tools, GUI applications, the Homebrew version of Zsh, and the configured language runtimes. The dotfiles are then linked into place.
@@ -23,19 +23,19 @@ On macOS, the bootstrap installs and configures Homebrew, command-line tools, GU
 
 | Command | Action |
 | --- | --- |
-| \`./setup.sh\` | Full setup (default). |
-| \`./setup.sh --dry-run\` | Preview actions without changing the system. |
-| \`./setup.sh --bootstrap-only\` | Run OS bootstrap without deploying dotfiles. |
-| \`./setup.sh --dotfiles-only\` | Deploy dotfiles without running the OS bootstrap. |
-| \`./setup.sh --help\` | Show usage. |
+| `./setup.sh` | Full setup (default). |
+| `./setup.sh --dry-run` | Preview actions without changing the system. |
+| `./setup.sh --bootstrap-only` | Run OS bootstrap without deploying dotfiles. |
+| `./setup.sh --dotfiles-only` | Deploy dotfiles without running the OS bootstrap. |
+| `./setup.sh --help` | Show usage. |
 
 The dry run does not install Homebrew or packages. If GNU Stow is already installed, it uses Stow's simulation mode to preview symlink operations.
 
 ## Repository layout
 
-- \`bootstrap/\`: OS-specific installation scripts.
-- \`aerospace/\`, \`ghostty/\`, \`starship/\`, \`zsh/\`: GNU Stow packages.
-- \`setup.sh\`: shared entrypoint and dotfile deployment.
+- `bootstrap/`: OS-specific installation scripts.
+- `aerospace/`, `ghostty/`, `starship/`, `zsh/`: GNU Stow packages.
+- `setup.sh`: shared entrypoint and dotfile deployment.
 
 AeroSpace is only deployed on macOS. Zsh, Ghostty, and Starship are treated as cross-platform packages.
 
